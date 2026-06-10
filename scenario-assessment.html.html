@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LE@D Leadership Scenario Assessment</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple-dark: #3C3489;
+      --purple-mid: #534AB7;
+      --purple: #7F77DD;
+      --purple-light: #AFA9EC;
+      --purple-bg: #EEEDFE;
+      --teal: #1D9E75;
+      --teal-bg: #E1F5EE;
+      --blue: #378ADD;
+      --blue-bg: #E6F1FB;
+      --coral: #D85A30;
+      --coral-bg: #FAECE7;
+      --amber: #BA7517;
+      --amber-bg: #FAEEDA;
+      --gray-100: #f8f8f6;
+      --gray-200: #efefeb;
+      --gray-300: #d3d1c7;
+      --gray-500: #888780;
+      --gray-700: #444441;
+      --gray-900: #2c2c2a;
+      --text: #1a1a18;
+      --text-secondary: #5a5a56;
+      --text-hint: #888780;
+      --border: rgba(0,0,0,0.12);
+      --border-mid: rgba(0,0,0,0.2);
+      --radius: 8px;
+      --radius-lg: 12px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--gray-100);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1rem 4rem;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .site-header {
+      margin-bottom: 2.5rem;
+    }
+
+    .site-header h1 {
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+
+    .site-header p {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .progress-wrap {
+      margin-bottom: 2rem;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text-hint);
+      margin-bottom: 6px;
+    }
+
+    .progress-track {
+      height: 3px;
+      background: var(--gray-300);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--purple);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+
+    .card {
+      background: #fff;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    .domain-badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: var(--radius);
+      margin-bottom: 0.85rem;
+    }
+
+    .scenario-text {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    .choices-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin: 1.25rem 0 0.75rem;
+    }
+
+    .choice-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.5rem;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      background: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.55;
+      transition: border-color 0.15s, background 0.15s;
+      font-family: inherit;
+    }
+
+    .choice-btn:hover { border-color: var(--border-mid); background: var(--gray-100); }
+    .choice-btn.selected { border-color: var(--purple); background: var(--purple-bg); color: var(--purple-dark); }
+
+    .followup-wrap { margin-top: 1.25rem; }
+
+    .followup-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 90px;
+      padding: 0.75rem;
+      font-size: 14px;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--text);
+      resize: vertical;
+      font-family: inherit;
+      line-height: 1.55;
+      transition: border-color 0.15s;
+    }
+
+    textarea:focus { outline: none; border-color: var(--purple); }
+
+    .char-count {
+      font-size: 12px;
+      color: var(--text-hint);
+      text-align: right;
+      margin-top: 4px;
+    }
+
+    .nav-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 1.25rem;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 0.6rem 1.25rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: inherit;
+      transition: opacity 0.15s, background 0.15s;
+      border: 0.5px solid var(--border);
+    }
+
+    .btn-primary {
+      background: var(--purple);
+      color: #fff;
+      border-color: var(--purple);
+    }
+
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+
+    .btn-secondary:hover { background: var(--gray-200); }
+
+    .loading-state {
+      padding: 2rem 0;
+      text-align: center;
+    }
+
+    .loading-state p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 2px solid var(--gray-300);
+      border-top-color: var(--purple);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Results */
+    .results-header { font-size: 22px; font-weight: 500; margin-bottom: 0.25rem; }
+    .results-sub { font-size: 14px; color: var(--text-secondary); margin-bottom: 1.75rem; }
+
+    .profile-card { margin-bottom: 1.5rem; }
+    .profile-title { font-size: 15px; font-weight: 500; margin-bottom: 1.25rem; color: var(--text); }
+
+    .domain-row { margin-bottom: 1rem; }
+    .domain-row:last-of-type { margin-bottom: 0; }
+
+    .domain-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 5px;
+    }
+
+    .domain-name-label { font-size: 13px; font-weight: 500; color: var(--text); }
+    .domain-level-label { font-size: 12px; color: var(--text-hint); }
+
+    .bar-track {
+      height: 8px;
+      background: var(--gray-200);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      width: 0%;
+      transition: width 1s ease;
+    }
+
+    .level-legend {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+      padding-top: 0.85rem;
+      border-top: 0.5px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    .summary-card {
+      background: var(--purple-bg);
+      border: 0.5px solid var(--purple-light);
+    }
+
+    .summary-card .card-title { font-size: 15px; font-weight: 500; color: var(--purple-dark); margin-bottom: 0.6rem; }
+    .summary-card .card-body { font-size: 14px; color: var(--purple-mid); line-height: 1.7; }
+    .summary-card .card-body p + p { margin-top: 0.6rem; }
+
+    .result-card .result-domain-badge { margin-bottom: 0.6rem; }
+    .result-card .result-choice { font-size: 13px; color: var(--text-hint); font-style: italic; margin-bottom: 0.85rem; }
+    .result-card .result-feedback { font-size: 14px; line-height: 1.7; color: var(--text); }
+    .result-card .result-feedback p + p { margin-top: 0.75rem; }
+
+    .actions-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-download {
+      background: var(--purple);
+      color: #fff;
+      border-color: var(--purple);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-download:hover { opacity: 0.88; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="site-header">
+    <h1>LE@D Leadership Scenario Assessment</h1>
+    <p>Five scenarios; one per competency domain. Choose a response, then reflect on your thinking.</p>
+  </div>
+  <div id="app"></div>
+</div>
+
+<script>
+const SCENARIO_BANK = {
+  "Self-Awareness & Personal Growth": [
+    {
+      text: "You're working on a group project and a teammate pulls you aside after a meeting. They say, kindly but directly, that you've been cutting people off without realizing it; others are becoming hesitant to speak up. You didn't notice you were doing it. How do you respond?",
+      choices: [
+        "Thank them, then take time to reflect privately before your next meeting; even though it stings.",
+        "Ask clarifying questions to understand specific moments where this happened.",
+        "Bring it up at the next meeting; invite the group to share norms for how you all want to communicate.",
+        "Feel frustrated; you've been contributing hard and don't think the criticism is fair; take a few days to process it."
+      ],
+      followup: "Why did you choose this response? What does it tell you about how you handle feedback and self-perception?"
+    },
+    {
+      text: "You're preparing for a high-stakes class presentation. A friend who reviewed your draft says it's solid; but you know in your gut that one section is weak. You're running out of time. What do you do?",
+      choices: [
+        "Submit as-is and trust your friend's read; they know the material too.",
+        "Cut the weak section entirely; a tighter presentation is better than a flawed one.",
+        "Stay up late to fix it; even at the cost of being tired for the presentation.",
+        "Present it as-is but flag the gap to your professor or audience upfront."
+      ],
+      followup: "What does your instinct here tell you about how you balance self-trust with external validation?"
+    },
+    {
+      text: "You've just received mid-term feedback from a supervisor at your internship. They praise your initiative but note that you sometimes move too fast; acting before the team has fully aligned. This isn't the first time you've heard something like this. How do you respond?",
+      choices: [
+        "Thank them and ask for a specific example so you can understand what it looked like in practice.",
+        "Reflect privately on why this pattern keeps showing up; and what you might be prioritizing over alignment.",
+        "Acknowledge it directly with your supervisor and ask them to flag it in the moment when they see it.",
+        "Feel defensive; your initiative has also produced results; and you're not sure the feedback is fully fair."
+      ],
+      followup: "This is a recurring pattern. What does your response reveal about how you approach repeated feedback on the same theme?"
+    }
+  ],
+  "Ethics & Integrity": [
+    {
+      text: "You're part of a peer committee reviewing applications for a competitive grant. Midway through deliberations, you realize one of the strongest applicants is a close friend. No one else on the committee knows. What do you do?",
+      choices: [
+        "Disclose the relationship to the committee immediately and recuse yourself from evaluating that application.",
+        "Stay quiet but make a conscious effort to be extra critical of your friend's application to balance any bias.",
+        "Mention it casually at the end of the process; the decision is nearly final anyway.",
+        "Recuse yourself from the full review process and ask the committee to assign a replacement."
+      ],
+      followup: "What values guided your choice? Were there competing obligations you had to weigh against each other?"
+    },
+    {
+      text: "You're a peer tutor and a student you've been working with asks you to look over their final paper. You notice several passages that appear to be AI-generated; in a course that explicitly prohibits it. They haven't asked for your opinion on that. What do you do?",
+      choices: [
+        "Say nothing; it's not your role to police their academic choices.",
+        "Mention what you noticed directly to the student; give them a chance to address it themselves.",
+        "Decline to continue the tutoring session and explain why briefly.",
+        "Report it to the course instructor; academic integrity is a shared responsibility."
+      ],
+      followup: "Where do your obligations as a peer tutor begin and end? What principles are you drawing on?"
+    },
+    {
+      text: "Your student org is applying for a grant that asks whether your programming reached at least 100 participants this year. Your best count is around 80; but attendance tracking was inconsistent and the real number could be higher. The deadline is tonight. How do you handle it?",
+      choices: [
+        "Report 80 as your confirmed number; note in the application that tracking was inconsistent.",
+        "Submit 100; the real number is probably close and the difference is small.",
+        "Skip the question entirely and hope it isn't disqualifying.",
+        "Reach out to the grant contact tonight to explain the situation and ask how to handle it."
+      ],
+      followup: "What's the principle at stake here? How do you think about honesty when the stakes are institutional rather than personal?"
+    }
+  ],
+  "Communication & Influence": [
+    {
+      text: "Two people in your project group have stopped communicating directly and are now routing everything through you. The tension is affecting momentum and a deadline is approaching. You're not the group leader; just a member who's noticed it. How do you handle it?",
+      choices: [
+        "Name what you're observing to the full group; invite a conversation about how you want to work together.",
+        "Talk to each person separately to understand their perspective; then try to broker a direct conversation.",
+        "Take on more coordination yourself to keep things moving; address the interpersonal tension after the deadline.",
+        "Send a message to both of them together; name the dynamic and ask them to resolve it between themselves."
+      ],
+      followup: "What communication approach matters most to you here; and what are you willing to trade off to use it?"
+    },
+    {
+      text: "You're part of a student org and have been asked to share difficult news with the broader membership: a highly anticipated event has been cancelled due to budget cuts no one could control. Members have been excited about this for months. How do you communicate it?",
+      choices: [
+        "Send a clear; direct message explaining what happened and why; without over-apologizing.",
+        "Acknowledge the disappointment first; then explain the situation; then share what happens next.",
+        "Frame it around what's still possible this year rather than leading with the loss.",
+        "Hold a brief meeting so people can ask questions and respond in real time."
+      ],
+      followup: "What did you prioritize in how you'd deliver this news? What do you think your audience most needs to hear?"
+    },
+    {
+      text: "During a group project debrief; a teammate gives you critical feedback in front of the full group that feels unfair and poorly timed. Others are watching to see how you respond. What do you do?",
+      choices: [
+        "Receive it calmly in the moment; then follow up with them privately afterward to share how it landed.",
+        "Push back in the moment; calmly but directly; because the feedback deserves a response.",
+        "Let it go entirely; the group dynamic matters more than defending yourself.",
+        "Acknowledge what might be valid in it publicly; then move the conversation forward."
+      ],
+      followup: "How did your choice balance your own needs with the group dynamic? What would you want the other person to understand afterward?"
+    }
+  ],
+  "Collaboration & Inclusion": [
+    {
+      text: "You're part of a team planning a campus event. During brainstorming; you notice the same two or three people are driving every decision while others; including newer members and a few international students; have barely spoken. No one else seems to notice. What do you do?",
+      choices: [
+        "Pause the meeting to name the dynamic; then suggest a structured round so everyone contributes.",
+        "Check in individually with the quieter members after the meeting; invite their input before the next session.",
+        "Suggest redesigning the process; like anonymous idea-sharing; to surface more voices.",
+        "Stay in the meeting but actively invite a quieter member's perspective when you see an opening."
+      ],
+      followup: "What assumptions are embedded in your choice about how inclusion should work in a group setting?"
+    },
+    {
+      text: "You're collaborating on a project with someone whose work style is very different from yours; they prefer to improvise and decide late; you like structure and early decisions. The tension is starting to slow things down. How do you address it?",
+      choices: [
+        "Name the difference directly; propose a hybrid approach that gives both of you some of what you need.",
+        "Adapt your style to theirs for this project; keeping the relationship smooth matters more than your preference.",
+        "Ask them to adapt to your approach; the project timeline requires more structure.",
+        "Divide the work so each of you can operate in your own style with minimal overlap."
+      ],
+      followup: "What does your instinct here tell you about how you navigate difference in collaborative relationships?"
+    },
+    {
+      text: "A member of your project group has been underperforming on shared tasks. The rest of the group is frustrated and starting to work around them rather than with them. You're not leading the group; you're a peer. What do you do?",
+      choices: [
+        "Talk to the person directly; privately; to understand what's going on before drawing conclusions.",
+        "Raise it with the group as a shared challenge; not a personal failing; and figure out a plan together.",
+        "Cover for them quietly for now; and check in after the project to see if they're okay.",
+        "Let the group dynamic play out; it's not your responsibility to manage a peer's performance."
+      ],
+      followup: "How do you think about peer accountability? Where does your responsibility begin and end when you're not in a leadership role?"
+    }
+  ],
+  "Critical Thinking & Strategic Action": [
+    {
+      text: "You're a member of a student committee tasked with recommending which of three proposed initiatives should receive limited funding. Each proposal has real merit but serves very different populations. The committee is leaning toward the most popular option without much analysis. How do you contribute to the decision?",
+      choices: [
+        "Slow the group down; propose a shared set of criteria before anyone advocates for a specific option.",
+        "Advocate clearly for the option you think is strongest; and explain your reasoning.",
+        "Ask the group what problem they're trying to solve; and whether the popular option actually addresses it.",
+        "Suggest the group gather more input from the populations each proposal would serve before deciding."
+      ],
+      followup: "What's your instinct when a group moves toward consensus too quickly? What do you think good decision-making requires?"
+    },
+    {
+      text: "You're part of a team halfway through executing a plan you spent weeks developing together. New information surfaces suggesting your core assumption was wrong. Changing course now means scrapping significant work. You're not the decision-maker; but you have a clear view of the problem. What do you do?",
+      choices: [
+        "Raise it clearly with whoever is leading; lay out what you've observed and what you think it means.",
+        "Bring it to the full team; this affects everyone and the decision should be shared.",
+        "Document your concern but hold off; the new information might not be conclusive.",
+        "Start quietly exploring what a course correction would look like before raising it; so you can bring a solution; not just a problem."
+      ],
+      followup: "What does your choice reveal about how you balance speaking up with respecting group process and authority?"
+    },
+    {
+      text: "Your group has been assigned a complex; open-ended problem with no obvious solution. Most members want to jump straight to brainstorming ideas. You think the group needs to spend more time defining the problem first. How do you handle the tension between your instinct and the group's momentum?",
+      choices: [
+        "Name it directly; propose a short problem-framing exercise before moving to ideas.",
+        "Go along with the brainstorm; then use the output to surface the underlying problem you think they're missing.",
+        "Ask a few pointed questions during brainstorming that force the group to clarify what they're actually trying to solve.",
+        "Let it go; your preference for structure might be slowing down creative energy the group needs right now."
+      ],
+      followup: "How do you think about the tension between process and momentum in group problem-solving? What are you willing to push on; and what aren't you?"
+    }
+  ]
+};
+
+const DOMAIN_ORDER = [
+  "Self-Awareness & Personal Growth",
+  "Ethics & Integrity",
+  "Communication & Influence",
+  "Collaboration & Inclusion",
+  "Critical Thinking & Strategic Action"
+];
+
+const DOMAIN_COLORS = [
+  { fill: '#7F77DD', light: '#EEEDFE', text: '#3C3489' },
+  { fill: '#1D9E75', light: '#E1F5EE', text: '#085041' },
+  { fill: '#378ADD', light: '#E6F1FB', text: '#0C447C' },
+  { fill: '#D85A30', light: '#FAECE7', text: '#712B13' },
+  { fill: '#BA7517', light: '#FAEEDA', text: '#633806' }
+];
+
+const LEVELS = [
+  { label: 'Emerging',      min: 0,  max: 33,  color: '#AFA9EC' },
+  { label: 'Developing',    min: 34, max: 66,  color: '#7F77DD' },
+  { label: 'Demonstrating', min: 67, max: 100, color: '#534AB7' }
+];
+
+const FEEDBACK_SYSTEM = `You are an expert leadership educator at Dartmouth College working with the LE@D (Leadership Education at Dartmouth) framework. LE@D holds that leadership comes in all forms and positions; it is not tied to a role or title. Leadership means leading self, leading others, and being led.
+
+The five LE@D competency domains are:
+1. Self-Awareness & Personal Growth: Self-Awareness, Emotional Intelligence, Resilience & Adaptability, Personal Growth
+2. Ethics & Integrity: Ethical Decision-Making, Accountability, Civic Responsibility, Professionalism
+3. Communication & Influence: Clear Communication, Active Listening, Conflict Resolution, Motivating Others
+4. Collaboration & Inclusion: Teamwork & Collaboration, Relationship Building, Group Dynamics, Cultural Competency & Inclusion
+5. Critical Thinking & Strategic Action: Critical Thinking & Analysis, Creative & Integrative Reasoning, Decision-Making, Strategic Planning
+
+Provide feedback that:
+- Affirms what the student's choice and reflection reveal about their strengths in the relevant domain
+- Names 1-2 specific competencies from the domain their response demonstrates
+- Offers one honest, constructive observation about what their choice may not have accounted for
+- Ends with one reflective question that pushes their thinking further
+
+Tone: warm, direct, collegiate; not clinical. 3-4 short paragraphs. No bullet points. Do not repeat the scenario back to them. Address the student as "you."
+
+After your prose feedback, append exactly this JSON on its own line with no other text after it:
+{"score": <integer 0-100>}
+
+Scoring guide:
+- 0-33 (Emerging): limited awareness of domain competencies; surface-level reflection
+- 34-66 (Developing): some competency evident; genuine engagement but gaps remain
+- 67-100 (Demonstrating): strong, integrated competency awareness across both choice and reflection`;
+
+const SUMMARY_SYSTEM = `You are an expert leadership educator at Dartmouth College working with the LE@D framework. LE@D holds that leadership is not tied to a role or title; it means leading self, leading others, and being led.`;
+
+function pickScenarios() {
+  return DOMAIN_ORDER.map(domain => {
+    const bank = SCENARIO_BANK[domain];
+    const idx = Math.floor(Math.random() * bank.length);
+    return { domain, ...bank[idx] };
+  });
+}
+
+function getLevel(score) {
+  return LEVELS.find(l => score >= l.min && score <= l.max) || LEVELS[1];
+}
+
+let scenarios = pickScenarios();
+let currentStep = 0;
+let responses = [];
+let feedbacks = [];
+let scores = [];
+let summaryText = '';
+let isGenerating = false;
+
+function render() {
+  const app = document.getElementById('app');
+  if (currentStep < scenarios.length) {
+    renderScenario(app);
+  } else if (!isGenerating && feedbacks.length === 0) {
+    isGenerating = true;
+    renderLoading(app);
+    generateAll();
+  } else if (feedbacks.length === scenarios.length) {
+    renderResults(app);
+  }
+}
+
+function renderScenario(app) {
+  const s = scenarios[currentStep];
+  const r = responses[currentStep] || { choice: null, followup: '' };
+  const col = DOMAIN_COLORS[currentStep];
+  const progress = (currentStep / scenarios.length) * 100;
+  const canProceed = r.choice !== null && r.followup.trim().length > 10;
+
+  app.innerHTML = `
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span>Scenario ${currentStep + 1} of ${scenarios.length}</span>
+        <span>${s.domain}</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${progress}%"></div></div>
+    </div>
+    <div class="card">
+      <span class="domain-badge" style="background:${col.light};color:${col.text}">${s.domain}</span>
+      <p class="scenario-text">${s.text}</p>
+      <p class="choices-label">What would you do?</p>
+      ${s.choices.map((c, i) => `<button class="choice-btn${r.choice === i ? ' selected' : ''}" onclick="selectChoice(${i})">${c}</button>`).join('')}
+      ${r.choice !== null ? `
+        <div class="followup-wrap">
+          <p class="followup-label">${s.followup}</p>
+          <textarea id="ta" placeholder="Write a few sentences about your thinking…" oninput="updateFollowup(this.value)">${r.followup}</textarea>
+          <div class="char-count" id="cc">${r.followup.length} characters</div>
+        </div>` : ''}
+    </div>
+    <div class="nav-row">
+      ${currentStep > 0 ? `<button class="btn btn-secondary" onclick="goBack()">Back</button>` : ''}
+      <button class="btn btn-primary" ${canProceed ? '' : 'disabled'} onclick="nextStep()">
+        ${currentStep === scenarios.length - 1 ? 'Get my feedback ↗' : 'Next scenario'}
+      </button>
+    </div>`;
+}
+
+function renderLoading(app) {
+  app.innerHTML = `
+    <div class="loading-state">
+      <p>Analyzing your responses across all five domains…</p>
+      <div class="spinner"></div>
+    </div>`;
+}
+
+async function generateAll() {
+  for (let i = 0; i < scenarios.length; i++) {
+    const s = scenarios[i];
+    const r = responses[i];
+    const prompt = `Domain: ${s.domain}\nScenario: ${s.text}\nStudent chose: "${s.choices[r.choice]}"\nStudent reflection: "${r.followup}"\n\nProvide feedback as described.`;
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: FEEDBACK_SYSTEM,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+      const data = await res.json();
+      const raw = data.content.map(b => b.text || '').join('');
+      const match = raw.match(/\{"score":\s*(\d+)\}/);
+      scores[i] = match ? Math.min(100, Math.max(0, parseInt(match[1]))) : 50;
+      feedbacks[i] = raw.replace(/\s*\{"score":\s*\d+\}\s*$/, '').trim();
+    } catch (e) {
+      scores[i] = 50;
+      feedbacks[i] = 'Feedback unavailable for this scenario. Please try again.';
+    }
+  }
+
+  const dataStr = scenarios.map((s, i) =>
+    `Domain: ${s.domain}\nChose: "${s.choices[responses[i].choice]}"\nReflection: "${responses[i].followup}"`
+  ).join('\n\n');
+
+  const summaryPrompt = `A student completed a five-scenario leadership self-assessment covering all LE@D domains. Here are their choices and reflections:\n\n${dataStr}\n\nWrite a 3-4 sentence integrative summary that names 2-3 standout leadership strengths evident across their responses; identifies one area or tension worth continued development; and ends with a forward-looking statement about their growth as a leader. Warm, direct tone. No bullet points.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 600,
+        system: SUMMARY_SYSTEM,
+        messages: [{ role: 'user', content: summaryPrompt }]
+      })
+    });
+    const data = await res.json();
+    summaryText = data.content.map(b => b.text || '').join('');
+  } catch (e) {
+    summaryText = 'See your domain feedback below for a full picture of your responses.';
+  }
+
+  render();
+}
+
+function renderResults(app) {
+  const profileRows = scenarios.map((s, i) => {
+    const col = DOMAIN_COLORS[i];
+    const level = getLevel(scores[i]);
+    return `
+      <div class="domain-row">
+        <div class="domain-meta">
+          <span class="domain-name-label">${s.domain}</span>
+          <span class="domain-level-label" style="color:${level.color}">${level.label}</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" id="bar-${i}" style="background:${col.fill}"></div>
+        </div>
+      </div>`;
+  }).join('');
+
+  const summaryParas = summaryText.split(/\n+/).filter(p => p.trim()).map(p => `<p>${p}</p>`).join('');
+
+  const resultCards = scenarios.map((s, i) => {
+    const col = DOMAIN_COLORS[i];
+    const paras = feedbacks[i].split(/\n+/).filter(p => p.trim()).map(p => `<p>${p}</p>`).join('');
+    return `
+      <div class="card result-card">
+        <span class="domain-badge result-domain-badge" style="background:${col.light};color:${col.text}">${s.domain}</span>
+        <p class="result-choice">You chose: "${s.choices[responses[i].choice]}"</p>
+        <div class="result-feedback">${paras}</div>
+      </div>`;
+  }).join('');
+
+  app.innerHTML = `
+    <h2 class="results-header">Your leadership profile</h2>
+    <p class="results-sub">Based on your choices and reflections across all five LE@D domains.</p>
+
+    <div class="card profile-card">
+      <p class="profile-title">Competency profile</p>
+      ${profileRows}
+      <div class="level-legend">
+        ${LEVELS.map(l => `<div class="legend-item"><div class="legend-dot" style="background:${l.color}"></div><span>${l.label}</span></div>`).join('')}
+      </div>
+    </div>
+
+    <div class="card summary-card">
+      <p class="card-title">Overall picture</p>
+      <div class="card-body">${summaryParas}</div>
+    </div>
+
+    ${resultCards}
+
+    <div class="actions-row">
+      <button class="btn btn-download" onclick="downloadPDF()">Download profile PDF</button>
+      <button class="btn btn-secondary" onclick="restart()">Start over</button>
+    </div>`;
+
+  setTimeout(() => {
+    scenarios.forEach((_, i) => {
+      const bar = document.getElementById('bar-' + i);
+      if (bar) bar.style.width = scores[i] + '%';
+    });
+  }, 100);
+}
+
+function downloadPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+
+  const margin = 54;
+  const pageW = doc.internal.pageSize.getWidth();
+  const contentW = pageW - margin * 2;
+  let y = margin;
+
+  const purple = [127, 119, 221];
+  const purpleDark = [60, 52, 137];
+  const gray = [90, 90, 86];
+  const lightGray = [245, 245, 243];
+  const black = [26, 26, 24];
+
+  function checkPage(needed) {
+    if (y + needed > doc.internal.pageSize.getHeight() - margin) {
+      doc.addPage();
+      y = margin;
+    }
+  }
+
+  function wrapText(text, x, maxW, fontSize, color, bold) {
+    doc.setFontSize(fontSize);
+    doc.setTextColor(...color);
+    doc.setFont('helvetica', bold ? 'bold' : 'normal');
+    const lines = doc.splitTextToSize(text, maxW);
+    lines.forEach(line => {
+      checkPage(fontSize * 1.5);
+      doc.text(line, x, y);
+      y += fontSize * 1.5;
+    });
+    return lines.length;
+  }
+
+  // Header
+  doc.setFillColor(...purple);
+  doc.rect(0, 0, pageW, 60, 'F');
+  doc.setFontSize(16);
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.text('LE@D Leadership Profile', margin, 36);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Leadership Education at Dartmouth', margin, 50);
+  y = 84;
+
+  // Date
+  doc.setFontSize(10);
+  doc.setTextColor(...gray);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Completed: ' + new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }), margin, y);
+  y += 24;
+
+  // Profile section
+  doc.setFontSize(13);
+  doc.setTextColor(...purpleDark);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Competency Profile', margin, y);
+  y += 18;
+
+  const barH = 10;
+  const barTrackW = contentW * 0.55;
+  const labelW = contentW * 0.38;
+  const levelW = contentW * 0.14;
+
+  scenarios.forEach((s, i) => {
+    checkPage(36);
+    const level = getLevel(scores[i]);
+    const col = DOMAIN_COLORS[i];
+    const hex = col.fill;
+    const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+
+    doc.setFontSize(10);
+    doc.setTextColor(...black);
+    doc.setFont('helvetica', 'normal');
+    const nameLines = doc.splitTextToSize(s.domain, labelW);
+    nameLines.forEach((ln, li) => { doc.text(ln, margin, y + li * 13); });
+
+    const barX = margin + labelW + 8;
+    const barY = y - 8;
+    doc.setFillColor(230, 230, 228);
+    doc.roundedRect(barX, barY, barTrackW, barH, 3, 3, 'F');
+    doc.setFillColor(r, g, b);
+    doc.roundedRect(barX, barY, barTrackW * (scores[i] / 100), barH, 3, 3, 'F');
+
+    doc.setFontSize(9);
+    doc.setTextColor(...gray);
+    doc.text(level.label, barX + barTrackW + 8, y);
+    y += Math.max(nameLines.length * 13, 20) + 6;
+  });
+
+  y += 8;
+
+  // Legend
+  doc.setFontSize(9);
+  doc.setTextColor(...gray);
+  doc.setFont('helvetica', 'normal');
+  const legendItems = LEVELS.map(l => l.label).join('   ·   ');
+  doc.text('Levels: ' + legendItems, margin, y);
+  y += 24;
+
+  // Overall picture
+  checkPage(40);
+  doc.setFontSize(13);
+  doc.setTextColor(...purpleDark);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Overall Picture', margin, y);
+  y += 16;
+  wrapText(summaryText.replace(/\n+/g, ' '), margin, contentW, 10, black, false);
+  y += 16;
+
+  // Domain feedback
+  scenarios.forEach((s, i) => {
+    checkPage(60);
+    const col = DOMAIN_COLORS[i];
+    const hex = col.light;
+    const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+
+    doc.setFillColor(r, g, b);
+    doc.roundedRect(margin, y - 14, contentW, 20, 3, 3, 'F');
+    doc.setFontSize(11);
+    doc.setTextColor(...purpleDark);
+    doc.setFont('helvetica', 'bold');
+    doc.text(s.domain, margin + 8, y);
+    y += 16;
+
+    doc.setFontSize(9);
+    doc.setTextColor(...gray);
+    doc.setFont('helvetica', 'italic');
+    const choiceLines = doc.splitTextToSize('You chose: "' + s.choices[responses[i].choice] + '"', contentW);
+    choiceLines.forEach(ln => { checkPage(14); doc.text(ln, margin, y); y += 13; });
+    y += 4;
+
+    const cleanFeedback = feedbacks[i].replace(/\n+/g, ' ');
+    wrapText(cleanFeedback, margin, contentW, 10, black, false);
+    y += 20;
+  });
+
+  // Footer
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let p = 1; p <= pageCount; p++) {
+    doc.setPage(p);
+    doc.setFontSize(8);
+    doc.setTextColor(...gray);
+    doc.text('LE@D Leadership Education at Dartmouth  ·  leadershiphub@dartmouth.edu', margin, doc.internal.pageSize.getHeight() - 28);
+    doc.text(`Page ${p} of ${pageCount}`, pageW - margin, doc.internal.pageSize.getHeight() - 28, { align: 'right' });
+  }
+
+  doc.save('lead-leadership-profile.pdf');
+}
+
+function selectChoice(i) {
+  if (!responses[currentStep]) responses[currentStep] = { choice: null, followup: '' };
+  responses[currentStep].choice = i;
+  render();
+  setTimeout(() => { const ta = document.getElementById('ta'); if (ta) ta.focus(); }, 50);
+}
+
+function updateFollowup(val) {
+  if (!responses[currentStep]) responses[currentStep] = { choice: null, followup: '' };
+  responses[currentStep].followup = val;
+  const cc = document.getElementById('cc');
+  if (cc) cc.textContent = val.length + ' characters';
+  const btn = document.querySelector('.btn-primary');
+  if (btn) btn.disabled = !(responses[currentStep].choice !== null && val.trim().length > 10);
+}
+
+function nextStep() { currentStep++; render(); window.scrollTo(0, 0); }
+function goBack() { currentStep--; render(); window.scrollTo(0, 0); }
+function restart() {
+  scenarios = pickScenarios();
+  currentStep = 0; responses = []; feedbacks = []; scores = []; summaryText = ''; isGenerating = false;
+  render(); window.scrollTo(0, 0);
+}
+
+render();
+</script>
+</body>
+</html>
