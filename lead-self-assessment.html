@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LE@D Leadership Self-Assessment</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --green: #00693E; --green-dark: #004d2e; --green-light: #e8f3ec; --blue: #2563eb; --purple: #7c3aed; --amber: #d97706; --red: #dc2626; --ink: #1a1a1a; --mid: #555; --light: #888; --border: #e0e0e0; --bg: #faf9f7; --white: #ffffff; --surface: #f5f4f1; --font: 'Arial', sans-serif; --serif: 'Georgia', serif; }
+  body { font-family: var(--font); background: var(--bg); color: var(--ink); min-height: 100vh; }
+  .container { max-width: 740px; margin: 0 auto; padding: 32px 20px 48px; }
+  .lead-badge { display: inline-block; background: var(--green); color: white; font-size: 11px; font-weight: bold; letter-spacing: 0.07em; text-transform: uppercase; padding: 3px 10px; border-radius: 4px; margin-bottom: 14px; }
+  .intro-title { font-family: var(--serif); font-size: 26px; font-weight: normal; color: var(--ink); margin-bottom: 14px; line-height: 1.3; }
+  .intro-body { font-size: 15px; color: var(--mid); line-height: 1.7; margin-bottom: 12px; }
+  .domain-list { list-style: none; margin: 12px 0 16px 4px; }
+  .domain-list li { font-size: 14px; color: var(--mid); padding: 5px 0 5px 18px; position: relative; line-height: 1.4; }
+  .domain-list li::before { content: ''; position: absolute; left: 0; top: 11px; width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+  .start-btn { background: var(--green); color: white; border: none; padding: 13px 32px; border-radius: 5px; font-size: 15px; font-weight: bold; cursor: pointer; font-family: var(--font); margin-top: 8px; transition: background 0.15s; }
+  .start-btn:hover { background: var(--green-dark); }
+  .progress-wrap { margin-bottom: 6px; background: #e0e0e0; border-radius: 99px; height: 5px; }
+  .progress-fill { height: 5px; border-radius: 99px; background: var(--green); transition: width 0.3s; }
+  .progress-label { font-size: 12px; color: var(--light); margin-bottom: 24px; margin-top: 6px; }
+  .domain-section-label { font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.07em; color: var(--green); margin-bottom: 4px; }
+  .domain-section-desc { font-size: 14px; color: var(--mid); line-height: 1.55; margin-bottom: 20px; }
+  .q-card { background: var(--white); border: 1px solid var(--border); border-radius: 7px; padding: 20px; margin-bottom: 14px; }
+  .q-comp-label { font-size: 11px; color: var(--light); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .q-text { font-size: 14px; color: var(--ink); line-height: 1.55; margin-bottom: 16px; font-weight: 500; }
+  .scale-row { display: flex; align-items: center; }
+  .scale-anchor { font-size: 11px; color: var(--light); white-space: nowrap; flex-shrink: 0; }
+  .scale-anchor-l { margin-right: 10px; }
+  .scale-anchor-r { margin-left: 10px; }
+  .scale-btns { display: flex; gap: 7px; flex: 1; justify-content: center; }
+  .scale-btn { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--surface); font-size: 14px; font-weight: bold; cursor: pointer; color: var(--mid); transition: all 0.1s; flex-shrink: 0; }
+  .scale-btn:hover { border-color: var(--green); color: var(--green); }
+  .scale-btn.selected { background: var(--green); border-color: var(--green); color: white; }
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; gap: 12px; }
+  .nav-btn { padding: 10px 22px; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; font-family: var(--font); border: 1.5px solid var(--border); background: var(--white); color: var(--mid); transition: all 0.12s; }
+  .nav-btn:hover { background: var(--surface); }
+  .nav-btn.primary { background: var(--green); border-color: var(--green); color: white; }
+  .nav-btn.primary:hover { background: var(--green-dark); }
+  .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .error-note { font-size: 12px; color: var(--red); margin-top: 10px; display: none; }
+  .results-header { background: var(--green); color: white; border-radius: 8px 8px 0 0; padding: 22px 28px; }
+  .results-title { font-family: var(--serif); font-size: 22px; font-weight: normal; margin-bottom: 4px; }
+  .results-sub { font-size: 13px; opacity: 0.8; }
+  .results-body { background: var(--white); border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; padding: 28px; margin-bottom: 24px; }
+  .section-head { font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.06em; color: var(--mid); margin-bottom: 16px; }
+  .chart-wrap { position: relative; width: 100%; height: 300px; margin-bottom: 28px; }
+  .domain-result { margin-bottom: 20px; }
+  .dr-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .dr-name { font-size: 14px; font-weight: bold; color: var(--ink); }
+  .dr-score { font-size: 13px; font-weight: bold; }
+  .bar-bg { background: var(--surface); border-radius: 99px; height: 8px; margin-bottom: 4px; }
+  .bar-fill { height: 8px; border-radius: 99px; transition: width 0.6s ease; }
+  .dr-tier { font-size: 11px; margin-bottom: 10px; }
+  .comp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 6px; }
+  .comp-chip { background: var(--surface); border: 1px solid var(--border); border-radius: 5px; padding: 6px 10px; font-size: 12px; color: var(--mid); display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .comp-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .share-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .share-label { font-size: 14px; color: var(--mid); font-weight: bold; }
+  .share-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .share-btn { padding: 8px 16px; border-radius: 5px; font-size: 13px; font-weight: bold; cursor: pointer; font-family: var(--font); border: 1.5px solid var(--border); background: var(--white); color: var(--mid); transition: all 0.12s; }
+  .share-btn:hover { background: var(--surface); }
+  .share-btn.green { background: var(--green); border-color: var(--green); color: white; }
+  .share-btn.green:hover { background: var(--green-dark); }
+  .rec-section-title { font-family: var(--serif); font-size: 20px; font-weight: normal; margin-bottom: 16px; color: var(--ink); }
+  .rec-card { background: var(--white); border: 1px solid var(--border); border-radius: 7px; padding: 18px; margin-bottom: 12px; }
+  .rec-tag { display: inline-block; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 3px; margin-bottom: 10px; }
+  .rec-name { font-size: 15px; font-weight: bold; color: var(--ink); margin-bottom: 2px; }
+  .rec-unit { font-size: 12px; color: var(--light); margin-bottom: 6px; }
+  .rec-desc { font-size: 13px; color: var(--mid); line-height: 1.5; }
+  .rec-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .rec-pill { font-size: 11px; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--border); color: var(--light); }
+  .retake-btn { background: none; border: 1.5px solid var(--green); color: var(--green); padding: 10px 22px; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer; font-family: var(--font); margin-top: 8px; }
+  .retake-btn:hover { background: var(--green-light); }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1a1a1a; color: white; padding: 10px 20px; border-radius: 5px; font-size: 13px; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 9999; }
+  .toast.show { opacity: 1; }
+  @media print { .share-bar, .retake-btn, .nav-row, .start-btn { display: none !important; } body { background: white; } .results-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+  @media (max-width: 500px) { .scale-btns { gap: 4px; } .scale-btn { width: 32px; height: 32px; font-size: 12px; } .share-bar { flex-direction: column; align-items: flex-start; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div id="intro-panel">
+    <span class="lead-badge">LE@D</span>
+    <h1 class="intro-title">Leadership Self-Assessment</h1>
+    <p class="intro-body">This self-assessment is designed to help you reflect on your strengths and growth areas across Dartmouth's five leadership competency domains:</p>
+    <ul class="domain-list">
+      <li>Self-Awareness &amp; Personal Growth</li>
+      <li>Ethics &amp; Integrity</li>
+      <li>Communication &amp; Influence</li>
+      <li>Collaboration &amp; Inclusion</li>
+      <li>Critical Thinking &amp; Strategic Action</li>
+    </ul>
+    <p class="intro-body">There are no right or wrong answers — this assessment is not graded or evaluated, and your results are for your own use and for anyone you choose to share them with. Your honest responses will generate a personalized leadership profile and recommendations for LE@D programs that align with your growth areas.</p>
+    <p class="intro-body">The assessment takes about 5 minutes. When you're finished, you'll be able to save and share your results.</p>
+    <button class="start-btn" onclick="startAssessment()">Begin assessment</button>
+  </div>
+  <div id="question-panel" style="display:none">
+    <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <p class="progress-label" id="progress-label">Domain 1 of 5</p>
+    <p class="domain-section-label" id="domain-header"></p>
+    <p class="domain-section-desc" id="domain-desc"></p>
+    <div id="questions-container"></div>
+    <p class="error-note" id="error-note">Please answer all questions before continuing.</p>
+    <div class="nav-row">
+      <button class="nav-btn" id="back-btn" onclick="goBack()">Back</button>
+      <button class="nav-btn primary" id="next-btn" onclick="goNext()">Next</button>
+    </div>
+  </div>
+  <div id="results-panel" style="display:none">
+    <div class="results-header">
+      <p class="results-title">Your leadership profile</p>
+      <p class="results-sub">Based on your self-assessment across 5 domains and 20 competencies</p>
+    </div>
+    <div class="results-body">
+      <p class="section-head">Domain scores</p>
+      <div class="chart-wrap"><canvas id="radarChart" role="img" aria-label="Radar chart of your scores across five leadership domains"></canvas></div>
+      <div id="domain-results"></div>
+    </div>
+    <div class="share-bar">
+      <span class="share-label">Save or share your results</span>
+      <div class="share-btns">
+        <button class="share-btn green" onclick="window.print()">Print / Save PDF</button>
+        <button class="share-btn" onclick="copyResults()">Copy summary</button>
+        <button class="share-btn" onclick="emailResults()">Email to myself</button>
+      </div>
+    </div>
+    <p class="rec-section-title">Recommended programs for your growth areas</p>
+    <div id="recommendations"></div>
+    <button class="retake-btn" onclick="retake()">Retake assessment</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const DOMAINS=[{id:'self',name:'Self-Awareness & Personal Growth',desc:'Effective leadership begins from the inside. This domain focuses on understanding your values, emotions, strengths, and limits — and committing to ongoing growth.',color:'#00693E',competencies:[{id:'self_awareness',name:'Self-Awareness',items:['I regularly reflect on how my values and beliefs influence my actions and impact on others.','I can identify my own strengths and limitations honestly and without defensiveness.','I seek out diverse perspectives to better understand my blind spots.']},{id:'emotional_intelligence',name:'Emotional Intelligence',items:['I recognize when my emotions are affecting my judgment and adjust accordingly.','I respond to others\' emotional states with thoughtfulness rather than reaction.','I can stay calm and constructive even in stressful or high-stakes situations.']},{id:'resilience',name:'Resilience & Adaptability',items:['When plans change unexpectedly, I adjust my approach without losing focus.','I recover from setbacks by reflecting on what I can learn and improve.','I remain effective and purposeful even when facing uncertainty or ambiguity.']},{id:'personal_growth',name:'Personal Growth',items:['I actively seek feedback and use it to improve, even when it\'s uncomfortable.','I know when to rely on my own strengths and when to ask for help.','I set intentional goals for my own development and follow through on them.']}]},{id:'ethics',name:'Ethics & Integrity',desc:'Leadership at Dartmouth is grounded in principled action. This domain addresses making decisions that reflect honesty, fairness, and accountability even when it\'s difficult.',color:'#2563eb',competencies:[{id:'ethical_decision',name:'Ethical Decision-Making',items:['When I face difficult decisions, I apply a consistent set of values rather than making it up as I go.','I can identify the ethical dimensions of complex situations even when they\'re not obvious.','I consider the impact of my decisions on people who aren\'t in the room.']},{id:'accountability',name:'Accountability',items:['I take responsibility for my mistakes rather than deflecting or making excuses.','I hold myself to the same expectations I hold others to.','I follow through on commitments even when it\'s inconvenient.']},{id:'civic',name:'Civic Responsibility',items:['I think about how my actions contribute to (or detract from) the communities I\'m part of.','I am motivated to work toward equity and justice, not just personal success.','I take my responsibilities as a community member seriously.']},{id:'professionalism',name:'Professionalism',items:['I demonstrate reliability and respect consistently, not just when it\'s being noticed.','I maintain integrity in my work and relationships across different contexts.','I represent myself and my affiliations with care and intentionality.']}]},{id:'comm',name:'Communication & Influence',desc:'Leadership depends on the ability to connect, persuade, and create space for others to contribute. This domain develops the skills to express ideas clearly and inspire action.',color:'#7c3aed',competencies:[{id:'clear_comm',name:'Clear Communication',items:['I can explain complex ideas clearly to audiences with different backgrounds and expertise.','I adapt my communication style depending on the context and the person.','My written and verbal communication is organized, precise, and purposeful.']},{id:'listening',name:'Active Listening',items:['I give people my full attention when they\'re speaking, without planning my response in parallel.','I ask follow-up questions that show I\'ve understood what someone said.','People feel genuinely heard in conversations with me.']},{id:'conflict',name:'Conflict Resolution',items:['I can engage in disagreements constructively without becoming defensive or dismissive.','I try to understand the interests underneath someone\'s stated position.','I help groups move through conflict toward productive outcomes.']},{id:'motivating',name:'Motivating Others',items:['I connect people\'s contributions to a larger purpose that matters to them.','I know how to energize and encourage others even when things are hard.','People feel inspired and supported when I\'m in a leadership role.']}]},{id:'collab',name:'Collaboration & Inclusion',desc:'Leadership is relational. This domain focuses on working effectively with others — building trust, valuing difference, and creating conditions for every person to contribute fully.',color:'#d97706',competencies:[{id:'teamwork',name:'Teamwork & Collaboration',items:['I share responsibilities fairly and contribute to group goals rather than just individual tasks.','I help groups function well even when roles are unclear or tensions arise.','I build cohesive teams by investing in relationships, not just outcomes.']},{id:'relationship',name:'Relationship Building',items:['I build trust with others through consistent empathy, reliability, and follow-through.','I invest in relationships beyond what\'s transactionally useful.','People feel they can count on me and be honest with me.']},{id:'group_dynamics',name:'Group Dynamics',items:['I understand how group processes affect outcomes and can facilitate productive group work.','I notice when dynamics are going wrong and take steps to address them.','I help groups manage conflict and navigate different roles effectively.']},{id:'inclusion',name:'Cultural Competency & Inclusion',items:['I engage across difference with genuine curiosity and humility.','I actively create environments where people with different backgrounds feel they belong.','I recognize and challenge systems and habits that exclude or marginalize others.']}]},{id:'critical',name:'Critical Thinking & Strategic Action',desc:'Leaders must analyze situations clearly, make sound decisions, and translate thinking into purposeful action. This domain develops intellectual and practical capacities to solve problems and act with rigor.',color:'#dc2626',competencies:[{id:'critical_thinking',name:'Critical Thinking & Analysis',items:['I evaluate information carefully before drawing conclusions, especially when it confirms what I already believe.','I can identify patterns and root causes in complex situations.','I apply knowledge across different contexts to solve novel problems.']},{id:'creative',name:'Creative & Integrative Reasoning',items:['I approach problems with imagination, not just conventional frameworks.','I draw connections across different disciplines or experiences to generate new solutions.','I take multiple perspectives into account when developing ideas.']},{id:'decision',name:'Decision-Making',items:['I weigh options thoughtfully and account for uncertainty rather than defaulting to the familiar.','I can commit to a course of action with clarity even when I don\'t have all the information.','My decisions reflect careful analysis, not just intuition or habit.']},{id:'strategic',name:'Strategic Planning',items:['I set clear goals and develop concrete plans to achieve them.','I manage resources and timelines effectively in pursuit of a larger vision.','I regularly evaluate whether my efforts are producing the outcomes I\'m aiming for.']}]}];
+const PROGRAMS=[{name:'DLAB',unit:'Student Life',domains:['self','ethics'],open:'First-year undergraduates',format:'7-week program',desc:'Sync daily activities with values and priorities.'},{name:'D.R.I.V.E.',unit:'Dartmouth Athletics',domains:['self','comm','ethics'],open:'Sophomore Summer Student-Athletes',format:'5 weeks, 9 sessions',desc:'Covers self-awareness, communication, conflict resolution, accountability, and decision-making.'},{name:'Foundations in Social Impact',unit:'Center for Social Impact',domains:['ethics','comm','collab'],open:'First-year undergraduates',format:'Weekly, Winter and Spring terms',desc:'Builds self-reflection, ethical community engagement, and effective communication.'},{name:'ImpACT Winterim Leadership Intensive',unit:'Center for Social Impact',domains:['ethics','collab','critical'],open:'All undergraduates',format:'3 weeks during Winterim',desc:'Intensive leadership development through social impact work.'},{name:'Rockefeller Leadership Fellows',unit:'Nelson A. Rockefeller Center',domains:['ethics','critical','comm'],open:'Juniors and seniors',format:'Two-term cohort program',desc:'Develops qualities and responsibilities expected of public policy leaders.'},{name:'Facilitating Dialogue Wellness Course',unit:'Dartmouth Dialogues',domains:['comm','collab'],open:'All undergraduates',format:'Two-day weekend course',desc:'Empathetic listening, purposeful sharing, and engagement across difference.'},{name:'Student Support Network',unit:'Counseling & Student Wellness',domains:['comm','collab'],open:'Undergrad and graduate students',format:'Four-session training',desc:'Communication skills, crisis intervention, and connecting peers with resources.'},{name:'Summer Leadership Program',unit:'Student Life',domains:['collab','ethics','comm'],open:'Sophomore Summer students',format:'4 weeks, four workshops',desc:'Community building, navigating difficult conversations, and ethical decision-making.'},{name:'DLAB Student Facilitators',unit:'Student Life',domains:['comm','collab','self'],open:'Sophomores, juniors, seniors',format:'Training + weekly facilitation',desc:'Develop facilitation, communication, and leadership skills.'},{name:'Group Development and Team Building',unit:'Dartmouth Outdoors',domains:['collab'],open:'All students',format:'Flexible',desc:'Team-building and group development through outdoor experiences.'},{name:'First-Year Fellows',unit:'Nelson A. Rockefeller Center',domains:['critical','ethics'],open:'First-year undergraduates',format:'9-week program',desc:'Introduces public policy thinking and civic engagement.'},{name:'Law and Ethics Fellowship',unit:'Ethics Institute',domains:['ethics','critical'],open:'All undergraduates',format:'3 terms, 9 sessions',desc:'Prepares scholars to become leaders in addressing poverty and injustice.'},{name:'Tuck Business Bridge',unit:'Tuck School of Business',domains:['comm','collab','critical'],open:'Rising sophomores through graduating seniors',format:'3 weeks intensive',desc:'Deepens leadership, presentation, and teamwork to build better decision-makers.'},{name:'Great Issues Scholars',unit:'Dickey Center',domains:['critical','ethics','comm'],open:'First-year undergraduates',format:'Year-long',desc:'Enhanced understanding of the world and current international events.'},{name:'Global Health Fellows',unit:'Dickey Center',domains:['critical','ethics','collab'],open:'Sophomores, juniors, seniors',format:'Year-long',desc:'Understanding of complex global health challenges.'},{name:'Indigenous Peer Mentor Leadership Retreat',unit:'Native American Program',domains:['collab','self','comm'],open:'Sophomores, juniors, seniors',format:'2-day retreat + year of mentorship',desc:'Values-centered leadership development and peer mentorship.'},{name:'King Scholars',unit:'First Generation Office',domains:['self','collab','ethics'],open:'Admitted/committed undergraduates',format:'Four years + FYSEP',desc:'Comprehensive leadership and academic support across the Dartmouth experience.'},{name:'Interfaith Living Learning Community',unit:'Tucker Center',domains:['collab','ethics','self'],open:'First-year undergraduates',format:'Year-long',desc:'Spiritual and ethical understanding of self and others.'},{name:'First Year Fellows (Entrepreneurship)',unit:'Magnuson Center',domains:['critical','comm'],open:'First-year undergraduates',format:'Weekly, winter and spring terms',desc:'Entrepreneurial thinking and innovation fundamentals.'},{name:'ROTC Programs',unit:'Army ROTC',domains:['ethics','self','critical','collab'],open:'Students pursuing military careers',format:'Four-year curriculum',desc:'Military leadership, real-world application, physical and mental readiness.'}];
+const DC={self:'#00693E',ethics:'#2563eb',comm:'#7c3aed',collab:'#d97706',critical:'#dc2626'};
+const DN={self:'Self-Awareness & Personal Growth',ethics:'Ethics & Integrity',comm:'Communication & Influence',collab:'Collaboration & Inclusion',critical:'Critical Thinking & Strategic Action'};
+let currentDomain=0,answers={},lastScores={};
+function startAssessment(){document.getElementById('intro-panel').style.display='none';document.getElementById('question-panel').style.display='block';renderDomain(0);}
+function renderDomain(idx){currentDomain=idx;const domain=DOMAINS[idx];document.getElementById('progress-fill').style.width=Math.round(idx/DOMAINS.length*100)+'%';document.getElementById('progress-label').textContent='Domain '+(idx+1)+' of '+DOMAINS.length;document.getElementById('domain-header').textContent=domain.name;document.getElementById('domain-desc').textContent=domain.desc;document.getElementById('back-btn').disabled=idx===0;document.getElementById('next-btn').textContent=idx===DOMAINS.length-1?'See my results':'Next';const c=document.getElementById('questions-container');c.innerHTML='';domain.competencies.forEach(comp=>{comp.items.forEach((item,i)=>{const qid=comp.id+'_'+i;const val=answers[qid];const card=document.createElement('div');card.className='q-card';card.innerHTML='<p class="q-comp-label">'+comp.name+'</p><p class="q-text">'+item+'</p><div class="scale-row"><span class="scale-anchor scale-anchor-l">Not like me</span><div class="scale-btns">'+[1,2,3,4,5].map(n=>'<button class="scale-btn'+(val===n?' selected':'')+'" onclick="setAnswer(\''+qid+'\','+n+',this)">'+n+'</button>').join('')+'</div><span class="scale-anchor scale-anchor-r">Very much like me</span></div>';c.appendChild(card);});});document.getElementById('error-note').style.display='none';window.scrollTo({top:0,behavior:'smooth'});}
+function setAnswer(qid,val,btn){answers[qid]=val;btn.closest('.scale-btns').querySelectorAll('.scale-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');}
+function goNext(){const domain=DOMAINS[currentDomain];if(domain.competencies.some(c=>c.items.some((_,i)=>answers[c.id+'_'+i]===undefined))){document.getElementById('error-note').style.display='block';return;}document.getElementById('error-note').style.display='none';if(currentDomain<DOMAINS.length-1){renderDomain(currentDomain+1);}else{showResults();}}
+function goBack(){if(currentDomain>0)renderDomain(currentDomain-1);}
+function getScores(){const s={};DOMAINS.forEach(domain=>{const ds=[];domain.competencies.forEach(comp=>{const vals=comp.items.map((_,i)=>answers[comp.id+'_'+i]||3);const avg=vals.reduce((a,b)=>a+b,0)/vals.length;s[comp.id]=parseFloat(avg.toFixed(2));ds.push(avg);});s[domain.id]=parseFloat((ds.reduce((a,b)=>a+b,0)/ds.length).toFixed(2));});return s;}
+function getTier(score){if(score>=4.2)return{label:'Strong foundation',color:'#00693E'};if(score>=3.2)return{label:'Developing',color:'#2563eb'};return{label:'Growth opportunity',color:'#d97706'};}
+function showResults(){const scores=getScores();lastScores=scores;document.getElementById('question-panel').style.display='none';document.getElementById('results-panel').style.display='block';new Chart(document.getElementById('radarChart').getContext('2d'),{type:'radar',data:{labels:['Self-Awareness','Ethics & Integrity','Communication','Collaboration','Critical Thinking'],datasets:[{data:DOMAINS.map(d=>parseFloat(((scores[d.id]-1)/4*100).toFixed(1))),backgroundColor:'rgba(0,105,62,0.1)',borderColor:'#00693E',borderWidth:2,pointBackgroundColor:'#00693E',pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{min:0,max:100,ticks:{stepSize:25,font:{size:10},backdropColor:'transparent',color:'#888'},grid:{color:'rgba(0,0,0,0.08)'},pointLabels:{font:{size:11},color:'#555'}}}}});const dr=document.getElementById('domain-results');dr.innerHTML='';DOMAINS.forEach(domain=>{const ds=scores[domain.id];const tier=getTier(ds);const pct=Math.round((ds-1)/4*100);const div=document.createElement('div');div.className='domain-result';div.innerHTML='<div class="dr-header"><span class="dr-name">'+domain.name+'</span><span class="dr-score" style="color:'+tier.color+'">'+ds.toFixed(1)+' / 5</span></div><div class="bar-bg"><div class="bar-fill" style="width:'+pct+'%;background:'+tier.color+'"></div></div><p class="dr-tier" style="color:'+tier.color+'">'+tier.label+'</p><div class="comp-grid">'+domain.competencies.map(comp=>'<div class="comp-chip"><span>'+comp.name+'</span><span class="comp-dot" style="background:'+getTier(scores[comp.id]).color+'"></span></div>').join('')+'</div>';dr.appendChild(div);});const gd=DOMAINS.map(d=>({...d,score:scores[d.id]})).sort((a,b)=>a.score-b.score).slice(0,3).map(d=>d.id);const recEl=document.getElementById('recommendations');recEl.innerHTML='';PROGRAMS.filter(p=>p.domains.some(d=>gd.includes(d))).slice(0,8).forEach(prog=>{const pd=prog.domains.find(d=>gd.includes(d))||prog.domains[0];const color=DC[pd]||'#00693E';const card=document.createElement('div');card.className='rec-card';card.innerHTML='<span class="rec-tag" style="background:'+color+'18;color:'+color+'">'+DN[pd]+'</span><p class="rec-name">'+prog.name+'</p><p class="rec-unit">'+prog.unit+'</p><p class="rec-desc">'+prog.desc+'</p><div class="rec-meta">'+(prog.open?'<span class="rec-pill">'+prog.open+'</span>':'')+(prog.format?'<span class="rec-pill">'+prog.format+'</span>':'')+'</div>';recEl.appendChild(card);});window.scrollTo({top:0,behavior:'smooth'});}
+function buildSummaryText(scores){let t='LE@D Leadership Self-Assessment Results\n========================================\n\nDomain Scores (out of 5):\n';DOMAINS.forEach(d=>{t+='  '+d.name+': '+scores[d.id].toFixed(1)+' — '+getTier(scores[d.id]).label+'\n';d.competencies.forEach(c=>{t+='    * '+c.name+': '+scores[c.id].toFixed(1)+'\n';});t+='\n';});const gd=DOMAINS.map(d=>({...d,score:scores[d.id]})).sort((a,b)=>a.score-b.score).slice(0,3).map(d=>d.id);t+='Recommended Programs:\n';PROGRAMS.filter(p=>p.domains.some(d=>gd.includes(d))).slice(0,6).forEach(p=>{t+='  * '+p.name+' ('+p.unit+')\n';});t+='\nGenerated via LE@D Leadership Hub — sites.dartmouth.edu/leadershiphub';return t;}
+function copyResults(){navigator.clipboard.writeText(buildSummaryText(lastScores)).then(()=>showToast('Results copied to clipboard'));}
+function emailResults(){window.open('mailto:?subject='+encodeURIComponent('My LE@D Leadership Self-Assessment Results')+'&body='+encodeURIComponent(buildSummaryText(lastScores)));}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function retake(){answers={};lastScores={};currentDomain=0;document.getElementById('results-panel').style.display='none';document.getElementById('intro-panel').style.display='block';window.scrollTo({top:0,behavior:'smooth'});}
+</script>
+</body>
+</html>
