@@ -635,18 +635,17 @@ async function generateAll() {
     const r = responses[i];
     const prompt = `Domain: ${s.domain}\nScenario: ${s.text}\nStudent chose: "${s.choices[r.choice]}"\nStudent reflection: "${r.followup}"\n\nProvide feedback as described.`;
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      const res = await fetch('https://chat.dartmouth.edu/api/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer xdjg8UsBC8kb22xK1bJiHCrfdrUWVLZuuZaq8NzlZLWB2OAGnR9Hvj4JkPfhmkPgMPwjU1ruDUFckFq9g7E29jnu9VA6V6E2eKX81HO672rGa0Sk0PrE8wgQOTkM9KSmI3DvwaK4wOPeb649C3C047lPaxHhi5GcXvM6byxCTZnHI6oVylL26bEhC0RNEFE5ekLvNd7il8rn8EkXpfPAVVumEPsg2kamRK6enb9vquUFEjegs5PpGucDS6fknLwPLhWadDRagbcCUL8LfTvYEoKXCqnkE921OdbqVCwJ4Ao1DrU7LPKjbXo8n5cYyqvw3oDk1v7KPS0N6LwKiXgwWzRU' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: 'anthropic.claude-sonnet-4-6',
           max_tokens: 1000,
-          system: FEEDBACK_SYSTEM,
-          messages: [{ role: 'user', content: prompt }]
+          messages: [{ role: 'system', content: FEEDBACK_SYSTEM }, { role: 'user', content: prompt }]
         })
       });
       const data = await res.json();
-      const raw = data.content.map(b => b.text || '').join('');
+      const raw = (data.choices?.[0]?.message?.content) || '';
       const match = raw.match(/\{"score":\s*(\d+)\}/);
       scores[i] = match ? Math.min(100, Math.max(0, parseInt(match[1]))) : 50;
       feedbacks[i] = raw.replace(/\s*\{"score":\s*\d+\}\s*$/, '').trim();
@@ -663,18 +662,17 @@ async function generateAll() {
   const summaryPrompt = `A student completed a five-scenario leadership self-assessment covering all LE@D domains. Here are their choices and reflections:\n\n${dataStr}\n\nWrite a 3-4 sentence integrative summary that names 2-3 standout leadership strengths evident across their responses; identifies one area or tension worth continued development; and ends with a forward-looking statement about their growth as a leader. Warm, direct tone. No bullet points.`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('https://chat.dartmouth.edu/api/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer xdjg8UsBC8kb22xK1bJiHCrfdrUWVLZuuZaq8NzlZLWB2OAGnR9Hvj4JkPfhmkPgMPwjU1ruDUFckFq9g7E29jnu9VA6V6E2eKX81HO672rGa0Sk0PrE8wgQOTkM9KSmI3DvwaK4wOPeb649C3C047lPaxHhi5GcXvM6byxCTZnHI6oVylL26bEhC0RNEFE5ekLvNd7il8rn8EkXpfPAVVumEPsg2kamRK6enb9vquUFEjegs5PpGucDS6fknLwPLhWadDRagbcCUL8LfTvYEoKXCqnkE921OdbqVCwJ4Ao1DrU7LPKjbXo8n5cYyqvw3oDk1v7KPS0N6LwKiXgwWzRU' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'anthropic.claude-sonnet-4-6',
         max_tokens: 600,
-        system: SUMMARY_SYSTEM,
-        messages: [{ role: 'user', content: summaryPrompt }]
+        messages: [{ role: 'system', content: SUMMARY_SYSTEM }, { role: 'user', content: summaryPrompt }]
       })
     });
     const data = await res.json();
-    summaryText = data.content.map(b => b.text || '').join('');
+    summaryText = (data.choices?.[0]?.message?.content) || '';
   } catch (e) {
     summaryText = 'See your domain feedback below for a full picture of your responses.';
   }
