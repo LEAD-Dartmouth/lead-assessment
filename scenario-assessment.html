@@ -635,9 +635,9 @@ async function generateAll() {
     const r = responses[i];
     const prompt = `Domain: ${s.domain}\nScenario: ${s.text}\nStudent chose: "${s.choices[r.choice]}"\nStudent reflection: "${r.followup}"\n\nProvide feedback as described.`;
     try {
-      const res = await fetch('https://chat.dartmouth.edu/api/chat/completions', {
+      const res = await fetch('https://dartmouth-chat-proxy.efmckenna77.workers.dev', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer xdjg8UsBC8kb22xK1bJiHCrfdrUWVLZuuZaq8NzlZLWB2OAGnR9Hvj4JkPfhmkPgMPwjU1ruDUFckFq9g7E29jnu9VA6V6E2eKX81HO672rGa0Sk0PrE8wgQOTkM9KSmI3DvwaK4wOPeb649C3C047lPaxHhi5GcXvM6byxCTZnHI6oVylL26bEhC0RNEFE5ekLvNd7il8rn8EkXpfPAVVumEPsg2kamRK6enb9vquUFEjegs5PpGucDS6fknLwPLhWadDRagbcCUL8LfTvYEoKXCqnkE921OdbqVCwJ4Ao1DrU7LPKjbXo8n5cYyqvw3oDk1v7KPS0N6LwKiXgwWzRU' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'anthropic.claude-sonnet-4-6',
           max_tokens: 1000,
@@ -662,9 +662,9 @@ async function generateAll() {
   const summaryPrompt = `A student completed a five-scenario leadership self-assessment covering all LE@D domains. Here are their choices and reflections:\n\n${dataStr}\n\nWrite a 3-4 sentence integrative summary that names 2-3 standout leadership strengths evident across their responses; identifies one area or tension worth continued development; and ends with a forward-looking statement about their growth as a leader. Warm, direct tone. No bullet points.`;
 
   try {
-    const res = await fetch('https://chat.dartmouth.edu/api/chat/completions', {
+    const res = await fetch('https://dartmouth-chat-proxy.efmckenna77.workers.dev', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer xdjg8UsBC8kb22xK1bJiHCrfdrUWVLZuuZaq8NzlZLWB2OAGnR9Hvj4JkPfhmkPgMPwjU1ruDUFckFq9g7E29jnu9VA6V6E2eKX81HO672rGa0Sk0PrE8wgQOTkM9KSmI3DvwaK4wOPeb649C3C047lPaxHhi5GcXvM6byxCTZnHI6oVylL26bEhC0RNEFE5ekLvNd7il8rn8EkXpfPAVVumEPsg2kamRK6enb9vquUFEjegs5PpGucDS6fknLwPLhWadDRagbcCUL8LfTvYEoKXCqnkE921OdbqVCwJ4Ao1DrU7LPKjbXo8n5cYyqvw3oDk1v7KPS0N6LwKiXgwWzRU' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'anthropic.claude-sonnet-4-6',
         max_tokens: 600,
