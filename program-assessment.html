@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LE@D Program Assessment Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #00693e;
+    --green-dark: #004f2f;
+    --green-light: #e8f5ee;
+    --green-mid: #c2e0ce;
+    --blue: #185FA5;
+    --blue-light: #e6f1fb;
+    --amber: #BA7517;
+    --amber-light: #faeeda;
+    --red: #A32D2D;
+    --red-light: #fcebeb;
+    --purple: #534AB7;
+    --purple-light: #eeedfe;
+    --text: #1a1a18;
+    --text-mid: #4a4a48;
+    --text-soft: #7a7a78;
+    --border: #e0ded6;
+    --border-mid: #c8c6be;
+    --surface: #ffffff;
+    --surface-1: #f7f6f2;
+    --surface-2: #f0efe9;
+    --radius: 8px;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--surface-1);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  header {
+    background: var(--green);
+    color: white;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .logo-mark {
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: -0.3px;
+    flex-shrink: 0;
+  }
+
+  .header-text h1 {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+  }
+
+  .header-text p {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-top: 1px;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+  }
+
+  .intro-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+
+  .intro-card p {
+    font-size: 13px;
+    color: var(--text-mid);
+    line-height: 1.65;
+  }
+
+  .intro-card p + p {
+    margin-top: 8px;
+  }
+
+  .framework-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .pill {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: var(--green-light);
+    color: var(--green-dark);
+    border: 1px solid var(--green-mid);
+  }
+
+  .program-field {
+    margin-bottom: 20px;
+  }
+
+  .program-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-mid);
+    margin-bottom: 6px;
+  }
+
+  .program-field input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border-mid);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.15s;
+  }
+
+  .program-field input:focus {
+    outline: none;
+    border-color: var(--green);
+  }
+
+  .mode-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .mode-btn {
+    padding: 14px 16px;
+    border: 1px solid var(--border-mid);
+    border-radius: 10px;
+    background: var(--surface);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+  }
+
+  .mode-btn:hover:not(.active) {
+    border-color: var(--green);
+    background: var(--green-light);
+  }
+
+  .mode-btn.active {
+    border-color: var(--green);
+    background: var(--green-light);
+    box-shadow: 0 0 0 1px var(--green);
+  }
+
+  .mode-btn-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .mode-btn-sub {
+    font-size: 12px;
+    color: var(--text-soft);
+    margin-top: 3px;
+  }
+
+  .progress-bar-outer {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    width: 0%;
+  }
+
+  .progress-label {
+    font-size: 12px;
+    color: var(--text-soft);
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+
+  .section-header {
+    padding: 14px 18px;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .section-info { flex: 1; min-width: 0; }
+  .section-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .section-desc { font-size: 12px; color: var(--text-soft); margin-top: 2px; }
+  .section-count { font-size: 12px; color: var(--text-soft); white-space: nowrap; flex-shrink: 0; }
+
+  .items { padding: 4px 0; }
+
+  .item {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .item:last-of-type { border-bottom: none; }
+
+  .item-q {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.55;
+    margin-bottom: 5px;
+  }
+
+  .item-ref {
+    font-size: 11px;
+    color: var(--text-soft);
+    margin-bottom: 8px;
+  }
+
+  .quick-options {
+    display: flex;
+    gap: 6px;
+  }
+
+  .q-opt {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid var(--border-mid);
+    border-radius: var(--radius);
+    background: var(--surface-1);
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-mid);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.12s;
+  }
+
+  .q-opt:hover { background: var(--surface-2); }
+  .q-opt.sel-0 { background: var(--green-light); color: var(--green-dark); border-color: #7cbf99; font-weight: 500; }
+  .q-opt.sel-1 { background: var(--amber-light); color: var(--amber); border-color: #e8c078; font-weight: 500; }
+  .q-opt.sel-2 { background: var(--red-light); color: var(--red); border-color: #e8a8a8; font-weight: 500; }
+
+  .rubric-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+  }
+
+  .r-opt {
+    padding: 7px 5px;
+    border: 1px solid var(--border-mid);
+    border-radius: var(--radius);
+    background: var(--surface-1);
+    font-size: 11px;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-mid);
+    cursor: pointer;
+    text-align: center;
+    line-height: 1.3;
+    transition: all 0.12s;
+  }
+
+  .r-opt:hover { background: var(--surface-2); }
+  .r-opt.sel-0 { background: var(--red-light); color: var(--red); border-color: #e8a8a8; font-weight: 500; }
+  .r-opt.sel-1 { background: var(--amber-light); color: var(--amber); border-color: #e8c078; font-weight: 500; }
+  .r-opt.sel-2 { background: var(--blue-light); color: var(--blue); border-color: #8fc0e8; font-weight: 500; }
+  .r-opt.sel-3 { background: var(--green-light); color: var(--green-dark); border-color: #7cbf99; font-weight: 500; }
+
+  .dim-notes-wrap {
+    padding: 12px 18px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--surface-1);
+  }
+
+  .dim-notes-wrap label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-soft);
+    display: block;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .dim-notes-wrap textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    resize: vertical;
+    min-height: 58px;
+    line-height: 1.5;
+    transition: border-color 0.15s;
+  }
+
+  .dim-notes-wrap textarea:focus {
+    outline: none;
+    border-color: var(--green);
+  }
+
+  .results {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-top: 24px;
+    overflow: hidden;
+  }
+
+  .results-header {
+    padding: 14px 18px;
+    background: var(--green);
+    color: white;
+  }
+
+  .results-header h2 {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .results-header p {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-top: 2px;
+  }
+
+  .results-body { padding: 20px 18px; }
+
+  .overall-score {
+    text-align: center;
+    padding: 20px 0 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+
+  .overall-num {
+    font-size: 48px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -1px;
+  }
+
+  .overall-label {
+    font-size: 13px;
+    color: var(--text-soft);
+    margin-top: 2px;
+  }
+
+  .overall-tier {
+    font-size: 13px;
+    margin-top: 8px;
+    font-weight: 500;
+  }
+
+  .dim-result { margin-bottom: 14px; }
+
+  .dim-result-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 5px;
+  }
+
+  .dim-result-label { font-size: 13px; color: var(--text); font-weight: 500; }
+  .dim-result-pct { font-size: 13px; font-weight: 600; }
+
+  .bar-track {
+    height: 7px;
+    background: var(--surface-2);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+
+  .dim-note-display {
+    font-size: 12px;
+    color: var(--text-soft);
+    font-style: italic;
+    margin-top: 5px;
+    line-height: 1.5;
+  }
+
+  .action-row {
+    display: flex;
+    gap: 8px;
+    padding: 0 18px 18px;
+    flex-wrap: wrap;
+  }
+
+  .action-btn {
+    padding: 9px 16px;
+    border: 1px solid var(--border-mid);
+    border-radius: var(--radius);
+    background: var(--surface-1);
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+
+  .action-btn:hover { background: var(--surface-2); border-color: var(--border-mid); }
+  .action-btn.primary { background: var(--green); color: white; border-color: var(--green); }
+  .action-btn.primary:hover { background: var(--green-dark); }
+
+  .footer {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-soft);
+    margin-top: 40px;
+    line-height: 1.7;
+  }
+
+  .footer a { color: var(--green); text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 520px) {
+    .rubric-options { grid-template-columns: repeat(2, 1fr); }
+    .mode-toggle { grid-template-columns: 1fr; }
+    .action-row { flex-direction: column; }
+    .action-btn { text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">LE@D</div>
+  <div class="header-text">
+    <h1>Program Assessment Tool</h1>
+    <p>LE@D — Leadership Education at Dartmouth</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="intro-card">
+    <p>Use this tool to evaluate a leadership program against established frameworks in higher education leadership development. Choose a quick check for a fast self-audit, or a full assessment for a detailed rubric-based review.</p>
+    <p>Results are scored across five dimensions and can be downloaded as a PDF to share with collaborators or use in program planning.</p>
+    <div class="framework-pills">
+      <span class="pill">ILA General Principles (2026)</span>
+      <span class="pill">CAS LEAD Standards</span>
+      <span class="pill">NACE Competencies</span>
+      <span class="pill">VALUE Rubrics</span>
+      <span class="pill">Smedick & Rice (2018)</span>
+    </div>
+  </div>
+
+  <div class="program-field">
+    <label for="prog-name">Program name</label>
+    <input type="text" id="prog-name" placeholder="e.g., First-Year Leadership Fellows" autocomplete="off" />
+  </div>
+
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="btn-quick" onclick="setMode('quick')">
+      <div class="mode-btn-title">Quick check</div>
+      <div class="mode-btn-sub">15 items · ~5 minutes · Yes / Partially / No</div>
+    </button>
+    <button class="mode-btn" id="btn-full" onclick="setMode('full')">
+      <div class="mode-btn-title">Full assessment</div>
+      <div class="mode-btn-sub">40 items · ~15 minutes · 4-point rubric</div>
+    </button>
+  </div>
+
+  <div class="progress-label">
+    <span id="progress-text">0 of 15 items answered</span>
+    <span id="progress-pct">0%</span>
+  </div>
+  <div class="progress-bar-outer">
+    <div class="progress-bar-fill" id="progress-fill"></div>
+  </div>
+
+  <div id="assessment-area"></div>
+  <div id="results-area"></div>
+
+  <div class="footer">
+    <a href="https://sites.dartmouth.edu/leadershiphub/" target="_blank">LE@D Leadership Hub</a> &nbsp;·&nbsp;
+    <a href="https://sites.dartmouth.edu/leadershiphub/staff-resources/" target="_blank">Resources for Program Developers</a><br>
+    Assessment framework based on ILA General Principles for Leadership Programs (2nd ed., 2026), CAS Leadership Education and Development Standards,<br>NACE Competencies, AAC&U VALUE Rubrics, and Smedick &amp; Rice (2018).
+  </div>
+
+</div>
+
+<script>
+const DIMS = [
+  {
+    id: 'context', label: 'Context & alignment',
+    desc: 'Program connects to institutional mission, student population, and real-world context',
+    numBg: '#e8f5ee', numColor: '#004f2f',
+    barColor: '#00693e',
+    quick: [
+      { q: 'The program explicitly connects to Dartmouth\'s mission and the LE@D competency framework.', ref: 'ILA: Context — Organizational' },
+      { q: 'The program is designed with your specific student population\'s developmental level and background in mind.', ref: 'ILA: Content — Foundations; CAS Standards' },
+      { q: 'The program addresses real-world leadership contexts relevant to students\' lives and future careers.', ref: 'ILA: Context — Global & National; NACE Competencies' },
+    ],
+    full: [
+      { q: 'The program has a clearly written purpose statement that connects to Dartmouth\'s institutional mission.', ref: 'ILA: Conceptual Framework — Philosophy & Purpose' },
+      { q: 'The program aligns with the LE@D five-domain competency framework.', ref: 'LE@D Framework' },
+      { q: 'The program design reflects an understanding of your target student population\'s developmental stage.', ref: 'ILA: Content — Foundations; CAS LEAD Standards' },
+      { q: 'The program acknowledges relevant local, national, or global contexts that shape leadership learning.', ref: 'ILA: Context — Global, National, Organizational' },
+      { q: 'The program promotes collaboration across campus rather than operating in isolation.', ref: 'ILA: Context — Organizational' },
+      { q: 'The program\'s scope and depth are appropriate given available human and fiscal resources.', ref: 'ILA: Conceptual Framework — Philosophy & Purpose' },
+      { q: 'Stakeholder expectations (students, staff, institution) are explicitly considered in program design.', ref: 'ILA: Context — Organizational; CAS Standards' },
+      { q: 'The program contributes to a coherent, institution-wide leadership learning experience.', ref: 'ILA: Conceptual Framework — Learning Environment' },
+    ]
+  },
+  {
+    id: 'framework', label: 'Conceptual framework',
+    desc: 'Program has a clear philosophy grounded in leadership theory and research',
+    numBg: '#e6f1fb', numColor: '#0c447c',
+    barColor: '#185FA5',
+    quick: [
+      { q: 'The program is grounded in at least one recognized leadership theory, model, or research base.', ref: 'ILA: Conceptual Framework' },
+      { q: 'The program\'s philosophy and goals are documented and accessible to facilitators and participants.', ref: 'ILA: Conceptual Framework — Philosophy & Purpose' },
+      { q: 'The program promotes an inclusive, relational view of leadership (not only positional/hierarchical).', ref: 'ILA: Content — Leadership Concepts; Social Change Model' },
+    ],
+    full: [
+      { q: 'The program is explicitly grounded in one or more named leadership theories or models.', ref: 'ILA: Conceptual Framework' },
+      { q: 'The conceptual framework is documented in written form (syllabus, program guide, facilitator notes).', ref: 'ILA: Conceptual Framework — Philosophy & Purpose' },
+      { q: 'The framework makes a clear distinction between leadership education, training, and development.', ref: 'ILA General Principles — Introduction' },
+      { q: 'The program defines leadership as a process (not just a role or position).', ref: 'ILA: Content — Leadership Concepts' },
+      { q: 'The program addresses both leading and following as equally important aspects of leadership.', ref: 'ILA: Content — Leadership Concepts' },
+      { q: 'The framework incorporates diverse perspectives and considers equity and inclusion explicitly.', ref: 'ILA: Conceptual Framework — Philosophy & Purpose; ILEC Priorities' },
+      { q: 'The conceptual framework informs all downstream design decisions (content, pedagogy, assessment).', ref: 'ILA: Conceptual Framework — Learning Environment' },
+      { q: 'The program references or incorporates established external standards (e.g., CAS, NACE, SLCs, VALUE Rubrics).', ref: 'Smedick & Rice (2018); CAS LEAD Standards' },
+    ]
+  },
+  {
+    id: 'content', label: 'Content & competencies',
+    desc: 'Program content addresses personal development, ethics, and relevant leadership competencies',
+    numBg: '#eeedfe', numColor: '#3c3489',
+    barColor: '#534AB7',
+    quick: [
+      { q: 'The program addresses personal development (self-awareness, values, identity) as a foundation for leadership.', ref: 'ILA: Content — Personal Development' },
+      { q: 'Ethical leadership — including character, integrity, and moral reasoning — is explicitly addressed.', ref: 'ILA: Content — Ethical Leadership' },
+      { q: 'Program content is appropriately matched to the competencies students need for their careers and civic lives.', ref: 'NACE Competencies; Smedick & Rice (2018)' },
+    ],
+    full: [
+      { q: 'The program builds self-awareness as a foundation for leadership growth.', ref: 'ILA: Content — Personal Development' },
+      { q: 'The program explicitly addresses ethical leadership through real-world examples and reflection.', ref: 'ILA: Content — Ethical Leadership' },
+      { q: 'Program content covers key interpersonal competencies: communication, collaboration, and conflict navigation.', ref: 'NACE Competencies; ILA: Content — Organizational' },
+      { q: 'Content is sequenced so that foundational concepts build toward more complex applications.', ref: 'ILA: Content — Foundations of Program' },
+      { q: 'The program helps students understand leadership in organizational contexts (not just individual growth).', ref: 'ILA: Content — Organizational Leadership' },
+      { q: 'The program addresses "bad" or toxic leadership as a counterexample and critical thinking prompt.', ref: 'ILA: Content — Leadership Concepts' },
+      { q: 'Content reflects both established theories and emerging or contemporary leadership approaches.', ref: 'ILA: Content — Leadership Concepts' },
+      { q: 'Global or cross-cultural dimensions of leadership are incorporated in some way.', ref: 'ILA: Content — Global Leadership' },
+    ]
+  },
+  {
+    id: 'learning', label: 'Learning design',
+    desc: 'Pedagogical methods are active, experiential, developmentally appropriate, and intentional',
+    numBg: '#e8f5ee', numColor: '#27500a',
+    barColor: '#3B6D11',
+    quick: [
+      { q: 'The program uses active and experiential learning strategies, not primarily lecture or passive content.', ref: 'ILA: Learning — Teaching & Learning Activities' },
+      { q: 'Reflection is built into the program design as a deliberate practice.', ref: 'ILA: Learning — Feedback & Assessment; VALUE Rubrics' },
+      { q: 'Instructional strategies are aligned to the stated learning goals of the program.', ref: 'ILA: Learning — Learning Goals; Smedick & Rice (2018)' },
+    ],
+    full: [
+      { q: 'The program uses at least one active or high-impact learning strategy (experiential, project-based, peer learning, etc.).', ref: 'ILA: Learning — Teaching & Learning Activities' },
+      { q: 'Structured reflection is a regular, designed part of the experience.', ref: 'ILA: Learning — Feedback & Assessment' },
+      { q: 'Instructional strategies match the developmental level of the target student population.', ref: 'ILA: Learning — Situational Factors of Learners' },
+      { q: 'The learning environment (physical or virtual) is intentionally designed to support leadership learning.', ref: 'ILA: Learning — Situational Factors of Learning Environment' },
+      { q: 'Facilitators/instructors connect theory to practice through concrete, real-world examples.', ref: 'ILA: Learning — Situational Factors of Leadership Educators' },
+      { q: 'Peer feedback is incorporated as a meaningful component of the learning experience.', ref: 'ILA: Learning — Feedback & Assessment' },
+      { q: 'The program creates a psychologically safe space that challenges and supports participants equally.', ref: 'ILA: Conceptual Framework — Learning Environment' },
+      { q: 'The role of technology (including AI) in leadership learning is thoughtfully addressed.', ref: 'ILA: Learning — Teaching & Learning Activities (2026 update)' },
+    ]
+  },
+  {
+    id: 'assessment', label: 'Assessment & outcomes',
+    desc: 'Outcomes are defined, measured, and used for continuous improvement',
+    numBg: '#faeeda', numColor: '#633806',
+    barColor: '#BA7517',
+    quick: [
+      { q: 'The program has written, specific learning outcomes that participants and facilitators can access.', ref: 'ILA: Metrics, Outcomes & Assessment' },
+      { q: 'At least one method for assessing participant learning is built into the program.', ref: 'ILA: Metrics, Outcomes & Assessment; Smedick & Rice (2018)' },
+      { q: 'Assessment results are reviewed and used to improve the program over time.', ref: 'ILA: Metrics, Outcomes & Assessment' },
+    ],
+    full: [
+      { q: 'The program has clearly written, specific, and measurable learning outcomes.', ref: 'ILA: Metrics, Outcomes & Assessment' },
+      { q: 'Outcomes are shared with participants before or at the start of the program.', ref: 'ILA: Metrics, Outcomes & Assessment' },
+      { q: 'Assessment methods are directly aligned to stated outcomes (not just post-event satisfaction surveys).', ref: 'ILA: Metrics, Outcomes & Assessment; Smedick & Rice (2018)' },
+      { q: 'The program uses a mix of assessment approaches (e.g., self-assessment, observation, reflection, artifacts).', ref: 'ILA: Learning — Feedback & Assessment; VALUE Rubrics' },
+      { q: 'Assessment data is collected at multiple points (not only at program end).', ref: 'ILA: Metrics, Outcomes & Assessment' },
+      { q: 'Assessment results are reviewed systematically and inform program revisions.', ref: 'ILA: Metrics, Outcomes & Assessment — Continuous Improvement' },
+      { q: 'Key stakeholders (students, facilitators, institutional partners) are involved in the evaluation process.', ref: 'ILA: Metrics, Outcomes & Assessment' },
+      { q: 'The program\'s outcomes contribute to institution-level goals (e.g., LE@D, CCL strategic plan).', ref: 'ILA: Metrics, Outcomes & Assessment; CAS Standards' },
+    ]
+  }
+];
+
+const QUICK_LABELS = ['Yes', 'Partially', 'No'];
+const FULL_LABELS = ['Absent', 'Emerging', 'Developed', 'Exemplary'];
+
+let mode = 'quick';
+let answers = {};
+let notes = {};
+
+function setMode(m) {
+  mode = m;
+  answers = {};
+  notes = {};
+  document.getElementById('btn-quick').classList.toggle('active', m === 'quick');
+  document.getElementById('btn-full').classList.toggle('active', m === 'full');
+  render();
+}
+
+function getItems(dim) { return mode === 'quick' ? dim.quick : dim.full; }
+
+function answer(dimId, idx, val) {
+  answers[dimId + '_' + idx] = val;
+  updateProgress();
+  updateSectionCount(dimId);
+  renderResults();
+}
+
+function setNote(dimId, val) { notes[dimId] = val; }
+
+function getAnsweredCount() {
+  return DIMS.reduce((s, d) => s + getItems(d).filter((_, i) => answers[d.id + '_' + i] !== undefined).length, 0);
+}
+
+function getTotalItems() { return DIMS.reduce((s, d) => s + getItems(d).length, 0); }
+
+function updateProgress() {
+  const answered = getAnsweredCount();
+  const total = getTotalItems();
+  const pct = Math.round((answered / total) * 100);
+  document.getElementById('progress-text').textContent = answered + ' of ' + total + ' items answered';
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function updateSectionCount(dimId) {
+  const dim = DIMS.find(d => d.id === dimId);
+  if (!dim) return;
+  const items = getItems(dim);
+  const answered = items.filter((_, i) => answers[dimId + '_' + i] !== undefined).length;
+  const el = document.getElementById('count-' + dimId);
+  if (el) el.textContent = answered + ' / ' + items.length;
+}
+
+function getDimScore(dim) {
+  const items = getItems(dim);
+  let total = 0, answered = 0;
+  items.forEach((_, i) => {
+    const key = dim.id + '_' + i;
+    if (answers[key] !== undefined) {
+      answered++;
+      total += mode === 'quick' ? (answers[key] === 0 ? 1 : answers[key] === 1 ? 0.5 : 0) : answers[key] / 3;
+    }
+  });
+  return answered === items.length ? Math.round((total / items.length) * 100) : null;
+}
+
+function getScoreColor(pct) {
+  return pct >= 80 ? '#0F6E56' : pct >= 60 ? '#185FA5' : pct >= 40 ? '#BA7517' : '#A32D2D';
+}
+
+function renderResults() {
+  const container = document.getElementById('results-area');
+  if (getAnsweredCount() < getTotalItems()) { container.innerHTML = ''; return; }
+
+  const dimScores = DIMS.map(d => ({ ...d, score: getDimScore(d) }));
+  const overall = Math.round(dimScores.reduce((s, d) => s + (d.score || 0), 0) / DIMS.length);
+
+  let tier, tierColor;
+  if (overall >= 80) { tier = 'Strong program — well-grounded and assessment-ready'; tierColor = '#0F6E56'; }
+  else if (overall >= 60) { tier = 'Developing program — solid foundation with room to grow'; tierColor = '#185FA5'; }
+  else if (overall >= 40) { tier = 'Emerging program — revisit framework, content, and assessment'; tierColor = '#BA7517'; }
+  else { tier = 'Early stage — significant development needed across multiple dimensions'; tierColor = '#A32D2D'; }
+
+  const progName = document.getElementById('prog-name').value || 'your program';
+  const modeLabel = mode === 'quick' ? 'Quick Check' : 'Full Assessment';
+
+  const bars = dimScores.map(d => {
+    const pct = d.score || 0;
+    const noteHtml = notes[d.id] ? `<div class="dim-note-display">"${notes[d.id]}"</div>` : '';
+    return `<div class="dim-result">
+      <div class="dim-result-top">
+        <span class="dim-result-label">${d.label}</span>
+        <span class="dim-result-pct" style="color:${getScoreColor(pct)}">${pct}%</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${d.barColor}"></div></div>
+      ${noteHtml}
+    </div>`;
+  }).join('');
+
+  container.innerHTML = `<div class="results">
+    <div class="results-header">
+      <h2>Results — ${progName}</h2>
+      <p>${modeLabel} · ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+    </div>
+    <div class="results-body">
+      <div class="overall-score">
+        <div class="overall-num">${overall}%</div>
+        <div class="overall-label">overall score</div>
+        <div class="overall-tier" style="color:${tierColor}">${tier}</div>
+      </div>
+      ${bars}
+    </div>
+    <div class="action-row">
+      <button class="action-btn primary" onclick="exportPDF()">Download PDF report</button>
+      <button class="action-btn" onclick="resetTool()">Start over</button>
+    </div>
+  </div>`;
+
+  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function exportPDF() {
+  const progName = document.getElementById('prog-name').value || 'Program';
+  const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  const dimScores = DIMS.map(d => ({ ...d, score: getDimScore(d) }));
+  const overall = Math.round(dimScores.reduce((s, d) => s + (d.score || 0), 0) / DIMS.length);
+
+  let tier;
+  if (overall >= 80) tier = 'Strong program — well-grounded and assessment-ready';
+  else if (overall >= 60) tier = 'Developing program — solid foundation with room to grow';
+  else if (overall >= 40) tier = 'Emerging program — revisit framework, content, and assessment';
+  else tier = 'Early stage — significant development needed across multiple dimensions';
+
+  const modeLabel = mode === 'quick' ? 'Quick Check (15 items)' : 'Full Assessment (40 items)';
+
+  const dimSections = dimScores.map(d => {
+    const pct = d.score || 0;
+    const noteHtml = notes[d.id] ? `<p style="font-size:11px;color:#666;font-style:italic;margin-top:6px">Notes: ${notes[d.id]}</p>` : '';
+    const items = getItems(d);
+    const itemRows = items.map((item, i) => {
+      const key = d.id + '_' + i;
+      const val = answers[key];
+      const valLabel = val !== undefined ? (mode === 'quick' ? QUICK_LABELS[val] : FULL_LABELS[val]) : '—';
+      const valColor = mode === 'quick'
+        ? (val === 0 ? '#0F6E56' : val === 1 ? '#BA7517' : '#A32D2D')
+        : (val === 3 ? '#0F6E56' : val === 2 ? '#185FA5' : val === 1 ? '#BA7517' : '#A32D2D');
+      return `<tr style="border-bottom:0.5px solid #eee">
+        <td style="padding:5px 8px;font-size:11px;color:#333;width:72%;line-height:1.4">${item.q}</td>
+        <td style="padding:5px 8px;font-size:10px;color:#888;width:18%">${item.ref}</td>
+        <td style="padding:5px 8px;font-size:11px;font-weight:600;color:${valColor};width:10%;text-align:right;white-space:nowrap">${valLabel}</td>
+      </tr>`;
+    }).join('');
+
+    return `<div style="margin-bottom:24px;page-break-inside:avoid">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+        <div style="font-size:13px;font-weight:700;color:#111">${d.label}</div>
+        <div style="font-size:14px;font-weight:700;color:${getScoreColor(pct)}">${pct}%</div>
+      </div>
+      <div style="height:7px;background:#eee;border-radius:4px;margin-bottom:6px">
+        <div style="height:7px;width:${pct}%;background:${d.barColor};border-radius:4px"></div>
+      </div>
+      <div style="font-size:11px;color:#888;margin-bottom:8px">${d.desc}</div>
+      ${noteHtml}
+      <table style="width:100%;border-collapse:collapse;margin-top:10px;border:0.5px solid #ddd">
+        <thead><tr style="background:#f5f5f5">
+          <th style="padding:5px 8px;font-size:10px;text-align:left;color:#666;font-weight:600;border-bottom:0.5px solid #ddd">Item</th>
+          <th style="padding:5px 8px;font-size:10px;text-align:left;color:#666;font-weight:600;border-bottom:0.5px solid #ddd">Source</th>
+          <th style="padding:5px 8px;font-size:10px;text-align:right;color:#666;font-weight:600;border-bottom:0.5px solid #ddd">Rating</th>
+        </tr></thead>
+        <tbody>${itemRows}</tbody>
+      </table>
+    </div>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+  <title>LE@D Program Assessment — ${progName}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, 'Times New Roman', serif; color: #111; max-width: 780px; margin: 0 auto; padding: 36px 32px; font-size: 13px; line-height: 1.5; }
+    h1 { font-size: 22px; font-weight: 700; color: #00693e; margin-bottom: 2px; font-family: Georgia, serif; }
+    .meta { font-size: 12px; color: #666; margin-bottom: 24px; font-family: Arial, sans-serif; }
+    .overall { display: flex; align-items: center; gap: 24px; padding: 18px 20px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 28px; background: #f9f9f7; }
+    .overall-num { font-size: 44px; font-weight: 700; color: #111; line-height: 1; font-family: Arial, sans-serif; }
+    .overall-right { flex: 1; }
+    .overall-tier { font-size: 13px; color: #444; margin-top: 4px; }
+    @media print {
+      body { padding: 12px 16px; }
+      @page { margin: 0.6in; }
+    }
+  </style>
+  </head><body>
+  <h1>LE@D Program Assessment</h1>
+  <div class="meta">${progName} &nbsp;·&nbsp; ${modeLabel} &nbsp;·&nbsp; ${date}</div>
+  <div class="overall">
+    <div class="overall-num">${overall}%</div>
+    <div class="overall-right">
+      <div style="font-size:13px;font-weight:600;color:#111">Overall score</div>
+      <div class="overall-tier">${tier}</div>
+    </div>
+  </div>
+  ${dimSections}
+  <div style="font-size:10px;color:#aaa;border-top:0.5px solid #eee;padding-top:14px;margin-top:28px;font-family:Arial,sans-serif;line-height:1.7">
+    LE@D — Leadership Education at Dartmouth &nbsp;·&nbsp; sites.dartmouth.edu/leadershiphub<br>
+    Assessment based on: ILA General Principles for Leadership Programs, 2nd ed. (2026) &nbsp;·&nbsp; CAS Leadership Education and Development Standards &nbsp;·&nbsp; NACE Competencies &nbsp;·&nbsp; AAC&U VALUE Rubrics &nbsp;·&nbsp; Smedick &amp; Rice (2018)
+  </div>
+  </body></html>`;
+
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (win) { setTimeout(() => win.print(), 600); }
+}
+
+function resetTool() {
+  answers = {};
+  notes = {};
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function render() {
+  const container = document.getElementById('assessment-area');
+  const total = getTotalItems();
+  document.getElementById('progress-text').textContent = '0 of ' + total + ' items answered';
+  document.getElementById('progress-pct').textContent = '0%';
+  document.getElementById('progress-fill').style.width = '0%';
+
+  let html = '';
+
+  DIMS.forEach((dim, di) => {
+    const items = getItems(dim);
+    html += `<div class="section">
+      <div class="section-header">
+        <div class="section-num" style="background:${dim.numBg};color:${dim.numColor}">${di + 1}</div>
+        <div class="section-info">
+          <div class="section-title">${dim.label}</div>
+          <div class="section-desc">${dim.desc}</div>
+        </div>
+        <div class="section-count" id="count-${dim.id}">0 / ${items.length}</div>
+      </div>
+      <div class="items">`;
+
+    items.forEach((item, ii) => {
+      const key = dim.id + '_' + ii;
+      const val = answers[key];
+      html += `<div class="item">
+        <div class="item-q">${item.q}</div>
+        <div class="item-ref">${item.ref}</div>`;
+
+      if (mode === 'quick') {
+        html += `<div class="quick-options">`;
+        QUICK_LABELS.forEach((lbl, oi) => {
+          const cls = val === oi ? ` sel-${oi}` : '';
+          html += `<button class="q-opt${cls}" onclick="answer('${dim.id}',${ii},${oi})">${lbl}</button>`;
+        });
+        html += `</div>`;
+      } else {
+        html += `<div class="rubric-options">`;
+        FULL_LABELS.forEach((lbl, oi) => {
+          const cls = val === oi ? ` sel-${oi}` : '';
+          html += `<button class="r-opt${cls}" onclick="answer('${dim.id}',${ii},${oi})">${lbl}</button>`;
+        });
+        html += `</div>`;
+      }
+      html += `</div>`;
+    });
+
+    const noteVal = notes[dim.id] || '';
+    const notePlaceholder = mode === 'full'
+      ? 'Optional notes — strengths, gaps, ideas for improvement...'
+      : 'Optional notes...';
+
+    html += `</div>
+      <div class="dim-notes-wrap">
+        <label>Notes (optional)</label>
+        <textarea placeholder="${notePlaceholder}" oninput="setNote('${dim.id}', this.value)">${noteVal}</textarea>
+      </div>
+    </div>`;
+  });
+
+  container.innerHTML = html;
+  document.getElementById('results-area').innerHTML = '';
+}
+
+render();
+</script>
+</body>
+</html>
