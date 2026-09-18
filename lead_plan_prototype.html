@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeaD Plan (prototype)</title>
+<style>
+  body { font-family: Arial, Helvetica, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; color: #2C2C2A; background: #fff; }
+  h1 { font-size: 24px; font-weight: 700; margin: 0; }
+  h1 span.d { color: #00693e; }
+  .topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; flex-wrap:wrap; gap:8px; }
+  p.instruction { font-size: 13px; color: #5F5E5A; margin: 0 0 20px; }
+  p.note { font-size: 13px; color: #5F5E5A; margin: 0 0 24px; }
+  p.label { font-size: 13px; color: #5F5E5A; margin: 0 0 8px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  button { font-family: inherit; }
+  button.chip { font-size: 13px; padding: 6px 14px; border-radius: 8px; border: 0.5px solid #B4B2A9; background: #fff; cursor: pointer; }
+  button.chip.active { background: #0C447C; color: #fff; border-color: transparent; }
+  button.plain { font-size: 13px; padding: 6px 14px; border-radius: 8px; border: 0.5px solid #B4B2A9; background: #fff; cursor: pointer; }
+  #result-count { font-size: 13px; color: #5F5E5A; margin: 0 0 12px; }
+  #internship-cta { display: none; border: 1px solid #85B7EB; background: #E6F1FB; border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; }
+  #internship-cta p { color: #0C447C; margin: 0 0 8px; font-size: 13px; }
+  #internship-cta p.title { font-weight: 700; font-size: 14px; }
+  #internship-cta a.btn, #internship-cta button.btn { display: inline-block; font-size: 13px; padding: 6px 14px; border-radius: 8px; border: 0.5px solid #0C447C; color: #0C447C; text-decoration: none; background:#fff; cursor:pointer; }
+  .card { border: 0.5px solid #D3D1C7; border-radius: 12px; padding: 12px 16px; margin-bottom: 8px; display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+  .card p { margin: 0; }
+  .card .name { font-size: 14px; font-weight: 700; }
+  .card .unit { font-size: 12px; color: #5F5E5A; margin-top: 2px; }
+  .card .timing { font-size: 12px; color: #888780; margin-top: 2px; }
+  .card .domains { font-size: 11px; color: #0C447C; margin-top: 4px; }
+  .badge { font-size: 11px; color: #888780; margin-left: 8px; font-weight: 400; }
+  .bottom-plan-row { display:flex; justify-content:center; margin-top: 20px; }
+  .plan-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  #plan-grid { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
+  @media (max-width: 600px) { #plan-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  .plan-col { background: #F1EFE8; border-radius: 12px; padding: 10px; min-height: 120px; }
+  .plan-col .year-title { font-size: 13px; font-weight: 700; margin: 0 0 8px; }
+  .plan-item { background: #fff; border: 0.5px solid #D3D1C7; border-radius: 8px; padding: 6px 8px; margin-bottom: 6px; }
+  .plan-item p { font-size: 12px; font-weight: 700; margin: 0; }
+  .plan-item button { font-size: 11px; margin-top: 4px; padding: 2px 8px; }
+  .empty-note { font-size: 11px; color: #888780; margin: 0; }
+  #plan-internship-row { margin-top: 12px; border: 1px solid #85B7EB; background: #E6F1FB; border-radius: 12px; padding: 12px 16px; display:flex; justify-content:space-between; align-items:center; }
+  #plan-internship-row p { font-size: 13px; color: #0C447C; margin: 0; }
+</style>
+</head>
+<body>
+<div class="topbar">
+<h1>Map out your Lea<span class="d">D</span> Plan!</h1>
+<button class="plain" id="plan-toggle"></button>
+</div>
+<p class="instruction">Add programs to see what your LeaD Plan might look like each year, or over your time at Dartmouth.</p>
+<p class="note">This is an early look (beta). Coverage is still growing, so if a program you know isn't showing up yet, that's expected, not a bug. <a href="mailto:leadershiphub@dartmouth.edu">Feedback welcome</a>.</p>
+
+<div id="browse-view">
+<p class="label">Class year</p>
+<div class="row" id="year-tabs"></div>
+<p class="label">Competency domain (select one or more)</p>
+<div class="row" id="domain-chips"></div>
+<p id="result-count"></p>
+<div id="internship-cta">
+  <p class="title">Internships and experiential learning</p>
+  <p>Available to every class year. Postings change constantly, so this pathway points to the live search rather than a fixed list. Eligibility can still vary by individual posting.</p>
+  <div class="row">
+  <a class="btn" href="https://careerdesign.dartmouth.edu/channels/search-for-a-job-internship/" target="_blank" rel="noopener">Search jobs and internships on Center for Career Design &#8599;</a>
+  <button class="btn" id="internship-add-btn" onclick="toggleInternshipInPlan()"></button>
+  </div>
+</div>
+<div id="program-list"></div>
+<div class="bottom-plan-row"><button class="plain" id="plan-toggle-bottom"></button></div>
+</div>
+
+<div id="plan-view" style="display:none;">
+<div class="plan-top">
+<p class="label" style="margin:0;">Your LeaD Plan</p>
+<button class="plain" id="reset-btn">Reset plan</button>
+</div>
+<div id="plan-grid"></div>
+<div id="plan-internship-row" style="display:none;"></div>
+</div>
+
+<script>
+const YEARS = ["First-year","Sophomore","Junior","Senior"];
+const DOMAINS = ["Self-awareness & growth","Ethics & integrity","Communication & influence","Collaboration & inclusion","Critical thinking & strategy"];
+const PROGRAMS = [{"name": "Pre-health Peer Mentor  Corps", "unit": "Health Professions Program", "timing": "Fall/Winter/Spring; day-long training+bi-weekly mtgs along with assigned mentees ", "apply": "Yes", "years": ["Junior", "Senior"], "domains": ["Collaboration & inclusion"]}, {"name": "Pathways to Medicine Scholars", "unit": "Health Professions Program", "timing": "Spring; Committment includes day-long introd; weekly sessions, overnight retreat.", "apply": "No", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Collaboration & inclusion"]}, {"name": "Internships and Career Programming", "unit": "Center for Social Impact", "timing": "Funded, 8-10 weeks in length, in-person, 40 hours per week; Off terms (Design Your Own Internships); Summer term (Cohort Internships); Fall term (Cape Town, South Africa Cohort Internship)", "apply": "Yes", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Collaboration & inclusion"]}, {"name": "Youth Education and Mentoring ", "unit": "Center for Social Impact", "timing": "Dependent on specific program", "apply": "Yes", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Collaboration & inclusion"]}, {"name": "Breaking the Mold: A Conference on Careers for the Common Good", "unit": "Center for Social Impact", "timing": " 2-day conference Fall term", "apply": "No", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Collaboration & inclusion"]}, {"name": "DCSI Student Directors", "unit": "Center for Social Impact", "timing": "Typically 1 year position", "apply": "Yes", "years": ["Sophomore", "Junior", "Senior"], "domains": ["Self-awareness & growth"]}, {"name": "Foundations in Social Impact", "unit": "Center for Social Impact", "timing": "Weekly sessions during the Winter and Spring terms", "apply": "Yes", "years": ["First-year"], "domains": ["Collaboration & inclusion"]}, {"name": "ImpACT Winterim Leadership Intensive", "unit": "Center for Social Impact", "timing": "Three weeks during Winterim (plus orientation late Fall term and poster session early Winter term)", "apply": "Yes", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Communication & influence", "Collaboration & inclusion", "Critical thinking & strategy"]}, {"name": "Social Impact Non-profit Consulting", "unit": "Center for Social Impact", "timing": "Fall, Winter, and Spring terms. Consultants should participate in a project at least 2 terms per academic year", "apply": "Yes", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Collaboration & inclusion", "Critical thinking & strategy"]}, {"name": "Student Support Network", "unit": "Counseling and Student Wellness", "timing": "Four-session training program", "apply": "No", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Communication & influence", "Collaboration & inclusion"]}, {"name": "D.R.I.V.E", "unit": "Dartmouth College Athletics", "timing": "Five weeks, nine sessions", "apply": "No", "years": ["Sophomore"], "domains": ["Self-awareness & growth", "Communication & influence", "Collaboration & inclusion"]}, {"name": "Facilitating Dialogue Wellness Course", "unit": "Dartmouth Dialogues", "timing": "Two-day weekend WE course", "apply": "Registration", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Communication & influence"]}, {"name": "Group Development and Team Building", "unit": "Dartmouth Outdoors", "timing": "Determined in conjunction with Facilitator(s)", "apply": "No", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Collaboration & inclusion"]}, {"name": "First-Year Trip Leaders/Croo", "unit": "Dartmouth Outdoors", "timing": "For Leaders: At the minimum, 4 field days during Orientation, plus several training days; For Croo: Duration of FYT (approximately 2 weeks supporting logistics and program needs), plus training", "apply": "Yes", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Collaboration & inclusion"]}, {"name": "First-Year Trips Directorate", "unit": "Dartmouth Outdoors", "timing": "Winter term through Mid September with weekly meetings - Planning and leading the logistics of FYT", "apply": "Yes", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Collaboration & inclusion"]}, {"name": "The Dartmouth Outing Club", "unit": "Dartmouth Outdoors", "timing": "Varies", "apply": "No ", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Self-awareness & growth", "Collaboration & inclusion"]}, {"name": "Law and Ethics Fellowship", "unit": "Ethics Institute", "timing": "Three terms; nine sessions", "apply": "No", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Ethics & integrity"]}, {"name": "Indigenous Peer Mentor Leadership Retreat", "unit": "Native American Program", "timing": "Two-day retreat and one year of mentorship", "apply": "Yes", "years": ["Sophomore", "Junior", "Senior"], "domains": ["Collaboration & inclusion"]}, {"name": "Indigenous Values-Centered Leadership Development Workshops", "unit": "Native American Program", "timing": "", "apply": "No", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Ethics & integrity"]}, {"name": "First-Year Fellows ", "unit": "Nelson A. Rockefeller Center", "timing": "Nine-week program", "apply": "Yes", "years": ["First-year"], "domains": ["Communication & influence", "Critical thinking & strategy"]}, {"name": "Rockefeller Leadership Fellows ", "unit": "Nelson A. Rockefeller Center", "timing": "Two-term cohort-based program open to juniors and seniors of all majors", "apply": "Yes", "years": ["Junior", "Senior"], "domains": ["Ethics & integrity", "Communication & influence", "Critical thinking & strategy"]}, {"name": "Dartmouth Leadership Attitudes & Behaviors Program (DLAB)", "unit": "Student Life", "timing": "7-week program", "apply": "Registration", "years": ["First-year"], "domains": ["Ethics & integrity"]}, {"name": "DLAB Student Facilitators", "unit": "Student Life", "timing": "Five hours of training plus; one 90-minute session per week for seven weeks", "apply": "Yes", "years": ["Sophomore", "Junior", "Senior"], "domains": ["Communication & influence"]}, {"name": "Summer Leadership Program", "unit": "Student Life", "timing": "Summer term; four weeks; four two-hour long workshops", "apply": "Registration", "years": ["Sophomore"], "domains": ["Ethics & integrity", "Collaboration & inclusion", "Critical thinking & strategy"]}, {"name": "SVPP Training Faciltiators ", "unit": "Student Wellness", "timing": "Term-long training; 3 10+ hours/week", "apply": "Yes", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Communication & influence"]}, {"name": "Peer Wellness Coaches", "unit": "Student Wellness", "timing": "Two term-long trainings.", "apply": "No", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Self-awareness & growth", "Collaboration & inclusion"]}, {"name": "Sexual Violence Prevention Project", "unit": "Student Wellness", "timing": "Four-Year program", "apply": "No", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Collaboration & inclusion"]}, {"name": "Arctic Innovation Scholars", "unit": "The John Sloan Dickey Center for International Understanding", "timing": "Year-long", "apply": "Yes", "years": ["Sophomore", "Junior", "Senior"], "domains": ["Ethics & integrity", "Communication & influence", "Collaboration & inclusion", "Critical thinking & strategy"]}, {"name": "War and Peace Fellows", "unit": "Davidson Institute for Global Security at the John Sloan Dickey Center for International Understanding", "timing": "Year-long. A winterim international trip and spring break trip to DC are also programmed for a smaller group of Fellows, by application.", "apply": "Yes", "years": ["Sophomore", "Junior", "Senior"], "domains": ["Ethics & integrity", "Collaboration & inclusion", "Critical thinking & strategy"]}, {"name": "Arctic International Internships", "unit": "The Institute of Arctic Studies at the John Sloan Dickey Center for International Understanding", "timing": "10-week Leave Term Opportunities; Offered all year", "apply": "Yes", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Self-awareness & growth"]}, {"name": "Stefansson Fellowship (Arctic)", "unit": "The Institute of Arctic Studies at the John Sloan Dickey Center for International Understanding", "timing": "10-week Leave Term Opportunities; Offered all year", "apply": "Yes", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Critical thinking & strategy"]}, {"name": "International Internships", "unit": "The John Sloan Dickey Center for International Understanding", "timing": "10-week Leave Term Opportunities; Offered all year", "apply": "Yes", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Self-awareness & growth"]}, {"name": "Introduction to Interfaith Leadership", "unit": "The William Jewett Tucker Center", "timing": "Fall WE Course", "apply": "No", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Self-awareness & growth", "Communication & influence", "Collaboration & inclusion"]}, {"name": "Tucker Fellows", "unit": "The William Jewett Tucker Center", "timing": "Year-long", "apply": "Yes", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Self-awareness & growth", "Communication & influence", "Collaboration & inclusion"]}, {"name": "Interfaith Alternative Spring Break", "unit": "The William Jewett Tucker Center", "timing": "Seven-day trip between Winter and Spring", "apply": "Yes", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Self-awareness & growth"]}, {"name": "Interfaith Living Learning Community", "unit": "The William Jewett Tucker Center", "timing": "Year-long", "apply": "Yes", "years": ["First-year"], "domains": ["Self-awareness & growth", "Communication & influence", "Collaboration & inclusion"]}, {"name": "Visual Interfaith Storytelling", "unit": "The William Jewett Tucker Center", "timing": "Winter WE Course", "apply": "Yes", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Ethics & integrity", "Communication & influence", "Collaboration & inclusion"]}, {"name": "Paganucci Fellows Program", "unit": "Tuck School of Business", "timing": "Takes part in Tuck Bridge for three weeks, and then 5 weeks of client project work. 8 weeks total", "apply": "No", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Communication & influence", "Collaboration & inclusion", "Critical thinking & strategy"]}, {"name": "Tuck Business Bridge", "unit": "Tuck School of Business", "timing": "Three weeks; 50-60 hours/week.", "apply": "Yes", "years": ["Sophomore", "Junior", "Senior"], "domains": ["Communication & influence", "Collaboration & inclusion"]}, {"name": "Tuck Consulting Bootcamp", "unit": "Tuck Undergraduate Education at Dartmouth ", "timing": "Three-day virtual program", "apply": "Yes", "years": ["Sophomore", "Junior", "Senior"], "domains": ["Critical thinking & strategy"]}, {"name": "Tuck Pathfinders", "unit": "Tuck Undergraduate Education at Dartmouth ", "timing": "Five multi-hour sessions throughout academic year", "apply": "Yes", "years": ["First-year"], "domains": ["Self-awareness & growth", "Communication & influence"]}, {"name": "Learning Fellows", "unit": "Dartmouth Center for the Advancement of Learning", "timing": "", "apply": "Yes", "years": ["First-year", "Sophomore", "Junior", "Senior"], "domains": ["Self-awareness & growth", "Communication & influence"]}];
+
+let selectedYear = "First-year";
+let selectedDomains = new Set();
+let internshipsSelected = false;
+let planEntries = [];
+let internshipInPlan = false;
+let showingPlan = false;
+let resetArmed = false;
+
+function toggleProgramInPlan(name, year){
+  const idx = planEntries.findIndex(e => e.name === name && e.year === year);
+  if(idx >= 0){ planEntries.splice(idx,1); } else { planEntries.push({name, year}); }
+  render();
+}
+function toggleInternshipInPlan(){ internshipInPlan = !internshipInPlan; render(); }
+function togglePlanView(){ showingPlan = !showingPlan; resetArmed = false; render(); }
+function resetPlan(){
+  if(!resetArmed){ resetArmed = true; render(); return; }
+  planEntries = []; internshipInPlan = false; resetArmed = false; render();
+}
+
+function renderPlanToggle(){
+  const count = planEntries.length + (internshipInPlan ? 1 : 0);
+  const label = showingPlan ? 'Back to browse' : ('View your plan (' + count + ')');
+  ['plan-toggle','plan-toggle-bottom'].forEach(id => {
+    const btn = document.getElementById(id);
+    if(!btn) return;
+    btn.textContent = label;
+    btn.onclick = togglePlanView;
+  });
+}
+
+function renderTabs(){
+  const yearEl = document.getElementById('year-tabs');
+  yearEl.innerHTML = '';
+  YEARS.forEach(y => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (y === selectedYear ? ' active' : '');
+    b.textContent = y;
+    b.onclick = () => { selectedYear = y; render(); };
+    yearEl.appendChild(b);
+  });
+  const domEl = document.getElementById('domain-chips');
+  domEl.innerHTML = '';
+  DOMAINS.concat(["Internships & experiential"]).forEach(d => {
+    const isInternship = d === "Internships & experiential";
+    const active = isInternship ? internshipsSelected : selectedDomains.has(d);
+    const b = document.createElement('button');
+    b.className = 'chip' + (active ? ' active' : '');
+    b.textContent = d;
+    b.onclick = () => {
+      if(isInternship){ internshipsSelected = !internshipsSelected; }
+      else { selectedDomains.has(d) ? selectedDomains.delete(d) : selectedDomains.add(d); }
+      render();
+    };
+    domEl.appendChild(b);
+  });
+}
+
+function renderBrowse(){
+  renderTabs();
+  document.getElementById('internship-cta').style.display = internshipsSelected ? 'block' : 'none';
+  const addBtn = document.getElementById('internship-add-btn');
+  addBtn.textContent = internshipInPlan ? 'Added to plan' : '+ Add to plan';
+  const matches = PROGRAMS.filter(p => p.years.includes(selectedYear) &&
+    (selectedDomains.size === 0 || p.domains.some(d => selectedDomains.has(d))));
+  const listEl = document.getElementById('program-list');
+  listEl.innerHTML = '';
+  matches.forEach(p => {
+    const inPlan = planEntries.some(e => e.name === p.name && e.year === selectedYear);
+    const card = document.createElement('div');
+    card.className = 'card';
+    const applyBadge = p.apply === 'No' ? '' : `<span class="badge">${p.apply === 'Registration' ? 'Registration required' : 'Application required'}</span>`;
+    card.innerHTML = `<div><p class="name">${p.name}${applyBadge}</p>
+      <p class="unit">${p.unit}</p>
+      <p class="timing">${p.timing}</p>
+      <p class="domains">${p.domains.join(', ')}</p></div>
+      <button class="plain" style="white-space:nowrap;">${inPlan ? 'Added' : '+ Add'}</button>`;
+    card.querySelector('button').onclick = () => toggleProgramInPlan(p.name, selectedYear);
+    listEl.appendChild(card);
+  });
+  document.getElementById('result-count').textContent = matches.length + (matches.length === 1 ? ' program matches' : ' programs match') + (selectedDomains.size ? '' : ' (all domains)');
+}
+
+function renderPlan(){
+  const grid = document.getElementById('plan-grid');
+  grid.innerHTML = '';
+  YEARS.forEach(y => {
+    const items = planEntries.filter(e => e.year === y);
+    const col = document.createElement('div');
+    col.className = 'plan-col';
+    let inner = `<p class="year-title">${y}</p>`;
+    if(items.length === 0){
+      inner += `<p class="empty-note">Nothing added yet.</p>`;
+    } else {
+      items.forEach(it => {
+        inner += `<div class="plan-item">
+          <p>${it.name}</p>
+          <button class="plain" data-n="${it.name.replace(/"/g,'&quot;')}" data-y="${y}">Remove</button>
+          </div>`;
+      });
+    }
+    col.innerHTML = inner;
+    grid.appendChild(col);
+  });
+  grid.querySelectorAll('[data-n]').forEach(btn => {
+    btn.onclick = () => toggleProgramInPlan(btn.getAttribute('data-n'), btn.getAttribute('data-y'));
+  });
+  const intRow = document.getElementById('plan-internship-row');
+  if(internshipInPlan){
+    intRow.style.display = 'flex';
+    intRow.innerHTML = `<p>Internships and experiential (any year) &mdash; Center for Career Design</p>
+      <button class="plain" id="rm-internship">Remove</button>`;
+    document.getElementById('rm-internship').onclick = toggleInternshipInPlan;
+  } else {
+    intRow.style.display = 'none';
+    intRow.innerHTML = '';
+  }
+  const resetBtn = document.getElementById('reset-btn');
+  resetBtn.textContent = resetArmed ? 'Click again to confirm' : 'Reset plan';
+  resetBtn.onclick = resetPlan;
+}
+
+function render(){
+  renderPlanToggle();
+  document.getElementById('browse-view').style.display = showingPlan ? 'none' : 'block';
+  document.getElementById('plan-view').style.display = showingPlan ? 'block' : 'none';
+  if(showingPlan){ renderPlan(); } else { renderBrowse(); }
+}
+render();
+</script>
+</body>
+</html>
